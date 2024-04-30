@@ -1,0 +1,36 @@
++ Get one mini game built and running on iPhone (15%)
+    + Sprint Swiper in Unity
+        + The referenced script (Unknown) on this Behaviour is missing!
+            + Need to attach the script to an object in the scene by dragging it on
+            + Use the main camera for now
+        + https://www.youtube.com/watch?v=0jTPKz3ga4w
+            + 2d position
+            + calculate our own collision for now as it is easy
+        + Two touch points (square will do)
+            + 100?
+            + Use mouse to start off with and for dev
+                + Support touch later
+        + collision
+            + Decrement counter and display it
+            + Just use a simple rectangle for the out of bounds?
+        + countdown
+            + Going down from target
+        + Timer
+            + https://gamedevbeginner.com/how-to-make-countdown-timer-in-unity-minutes-seconds/
+            + Milliseconds
+            + Timer going up
+            + Stop when counter goes to 0
+        + Basic polish
+            + Make target spot white
+            + Restart when out of track
+        + Support touch
+            + Or will this just work?
+        + Get it running on phone
+            + Simulator too
+    + Get this running on phone
+        + xcode
+            + needs apple id
+        + sudo xcode-select --switch /Applications/Xcode.app
+        + xcodebuild test -destination "platform=iOS,id=00008030-000964D22182402E" -scheme Unity-iPhone
+        + https://stackoverflow.com/questions/50758642/how-to-create-a-free-ios-development-provisioning-profile
+        + com.thetouchgames.app

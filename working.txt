@@ -1,0 +1,104 @@
+- The Touch Games
+    - Some form of game auth?
+    - High scores
+    - 7 event types, ROYGBIV
+        - Tapper
+        - Swiper
+        - Beeper
+        - Rotator
+        - Timer
+        - Balancer
+        - Tracer
+    - Event details
+        - Beeper
+            - Drag finger between two points
+            - Faster and faster
+            - Until you don't make it
+            - Threshold based on the timing
+            - Not too early, not too late
+        - Tapper
+            - 100 taps
+            - Time between two spots (close together)
+        - Swiper
+            - Sprint Swiper
+                - 100 swipes
+                - Time between two spots (far apart together)
+            - Middle distance Swiper
+                - 4 corners
+                - Swipe between
+                - 400 swipes
+            - Marathon Swiper
+                - 4 corners
+                - Swipe between
+                - 40000 swipes
+        - Rotator
+            - Rotate 5 times
+            - Get faster
+            - Release between the arcs
+        - Timer
+            - 5 random beats to hit
+            - 5th time hold and hit fast marker
+        - Balancer
+            - 2 fingers
+            - Drag back
+            - Keep circle balanced for as long as possible
+        - Tracer
+            - Follow a track
+            - Figure of 8?
+    - Future features
+        - Local play
+            - Pass the phone?
+        - Multiplayer
+            - Each event at the same time?
+    - Leader boards
+        - https://cloudonce.github.io/index.html
+            - https://www.youtube.com/watch?v=v-ITInk5HLY
+        - https://assetstore.unity.com/packages/tools/integration/ios-game-center-plugin-for-unity-14839
+    - Design overhaul
+        - Logo
+        - SVG icons
+        - Celebration on victory
+    - Play test
+
+- Polish up Swiper after testing on phone
+    + Lock orientation
+        + https://discussions.unity.com/t/landscape-mode-only/114273/4
+        + Edit -> Project Settings -> Player -> iOS -> Orientation
+            + Allowed orientations
+    + Make it so you have to swipe (can hack it with tap)
+        + Make sure if on mobile touchpoints != 1?
+            + Input.touchCount
+        + #if UNITY_IOS?
+            // #if UNITY_ANDROID
+            //     Debug.Log("UNITY_ANDROID????");
+            //     this.usingTouchDevice = true;
+            // #endif
+            // #if UNITY_IOS
+            //     Debug.Log("UNITY_IOS????");
+            //     this.runningInEditor = true;
+            // #endif
+        + Application.isEditor seems to work ok
+    - Timer 30fps rounding
+        - Fake the last set of ms
+        - It will always be a multiple of 0.033*
+        - 1.134
+        - Take the last point when we went in to the box
+            - | ----> |   *       |
+            - Work out how far away the point is from the collision point for the last swipe
+            - Adjust the last chunk of time accordingly?
+        - box
+            - topLeft
+            - bottomRight
+        - https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
+            - 
+    - Get back to menu button
+        - Make this a long hold to get back
+    - Do the 3 versions
+        - Sprint
+        - Middle
+        - Marathon
+    - Get this code checked in somewhere!
+        - Just in case machine goes belly
+        - ssh-keygen -t ed25519 -f ~/.ssh/personal-github -C "christopher.heathwood+github@gmail.com"
+        - ssh-add --apple-use-keychain ~/.ssh/personal-github
+        - pbcopy < ~/.ssh/personal-github.pub
