@@ -78,6 +78,17 @@
             //     this.runningInEditor = true;
             // #endif
         + Application.isEditor seems to work ok
+    + Get this code checked in somewhere!
+        + Just in case machine goes belly
+        + ssh-keygen -t ed25519 -f ~/.ssh/personal-github -C "christopher.heathwood+github@gmail.com"
+        + ssh-add --apple-use-keychain ~/.ssh/personal-github
+        + pbcopy < ~/.ssh/personal-github.pub
+    - Get back to menu button
+        - Make this a long hold to get back
+    - Do the 3 versions
+        - Sprint
+        - Middle
+        - Marathon
     - Timer 30fps rounding
         - Fake the last set of ms
         - It will always be a multiple of 0.033*
@@ -91,14 +102,3 @@
             - bottomRight
         - https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
             - 
-    - Get back to menu button
-        - Make this a long hold to get back
-    - Do the 3 versions
-        - Sprint
-        - Middle
-        - Marathon
-    - Get this code checked in somewhere!
-        - Just in case machine goes belly
-        - ssh-keygen -t ed25519 -f ~/.ssh/personal-github -C "christopher.heathwood+github@gmail.com"
-        - ssh-add --apple-use-keychain ~/.ssh/personal-github
-        - pbcopy < ~/.ssh/personal-github.pub

@@ -34,3 +34,4 @@
         + xcodebuild test -destination "platform=iOS,id=00008030-000964D22182402E" -scheme Unity-iPhone
         + https://stackoverflow.com/questions/50758642/how-to-create-a-free-ios-development-provisioning-profile
         + com.thetouchgames.app
+

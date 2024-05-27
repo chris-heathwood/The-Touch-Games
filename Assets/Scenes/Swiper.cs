@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class Swiper : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Swiper : MonoBehaviour
     public TextMeshProUGUI counterText;
     public TextMeshProUGUI timerText;
 
-    private int counter = 10;
+    private int counter = 1;
     private Vector2 previousPoint;
     private float timer = 0;
     private bool timerStarted = false;
@@ -54,7 +55,7 @@ public class Swiper : MonoBehaviour
 
     void ResetGame()
     {
-        this.counter = 10;
+        this.counter = 2;
         this.leftSpot.color = this.white;
         this.menuButton.gameObject.SetActive(false);
         this.resetButton.gameObject.SetActive(false);
@@ -72,7 +73,11 @@ public class Swiper : MonoBehaviour
     //     // Speed = Distance / Time
     //     double speed = totalDistance / Time.deltaTime;
 
-
+    // Calculate direction
+    // Then know which side you are crossing
+    // Then intersection
+    // We know it intersects so can do it faster maybe?
+    // and it is just an x or a y
 
     //         // TODO Which box did a finish on? us that for distanceToFinishLine
     //         // double distanceToFinishLine = Math.Sqrt(Math.Pow(point.x - this.previousPoint.x, 2) + Math.Pow(point.y - this.previousPoint.y, 2));
@@ -143,17 +148,60 @@ public class Swiper : MonoBehaviour
 
 
         // Timer
-        if (timerStarted == true && this.counter > 0)
+        if (timerStarted == true)
         {
-            this.timer += Time.deltaTime;
-        }
+            if (this.counter > 0)
+            {
+                this.timer += Time.deltaTime;
+            }
+            else if (this.counter == 0)
+            {
+                // On devices we are stuck at 30fps (or near to it so Time.deltaTime will always be 0.033...) so calculate a more accurate time for
+                // the final delta
+                float timeCheck = this.timer + Time.deltaTime;
+                Debug.Log("Time would have been" + timeCheck);
 
-        if (this.counter == 0)
-        {
+                // Calculate the total distance traveled (using Pythagorean theorem)
+                double totalDistance = Math.Sqrt(Math.Pow(previousPoint.x - point.x, 2) + Math.Pow(previousPoint.y - point.y, 2));
+
+                Debug.Log("Total distance: " + totalDistance);
+
+                // Speed = Distance / Time
+                double speed = totalDistance / Time.deltaTime;
+
+                // Find the distance travelled in that time
+                SpriteRenderer finalSpot = this.toggle == false ? this.rightSpot : this.leftSpot;
+
+                Bounds bounds = finalSpot.bounds;
+                Vector2 direction = point - this.previousPoint;
+                Ray ray = new(previousPoint, direction);
+
+                Debug.Log("Previous point: " + this.previousPoint);
+                Debug.Log("Point: " + point);
+                Debug.Log("Direction: " + direction);
+
+                if (bounds.IntersectRay(ray, out float distance))
+                {
+                    Debug.Log("Collide Distance: " + distance);
+
+                    // Time = Distance / Speed
+                    double time = distance / speed;
+
+                    Debug.Log("Time to collision: " + time);
+
+                    this.timer += (float)time;
+
+                    Debug.Log("Time is" + this.timer);
+                }
+                else
+                {
+                    // The ray does not intersect the bounds
+                    Debug.Log("No intersection");
+                }
 
 
-
-            this.EndGame();
+                this.EndGame();
+            }
         }
 
         // Update UI
