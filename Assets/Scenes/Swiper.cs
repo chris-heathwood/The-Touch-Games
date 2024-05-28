@@ -20,7 +20,7 @@ public class Swiper : MonoBehaviour
 
     private int counter = 1;
     private Vector2 previousPoint;
-    private float timer = 0;
+    private double timer = 0;
     private bool timerStarted = false;
     private bool timerFinished = false;
     private bool toggle = false; // false is left hit box, true is right hit box
@@ -66,35 +66,6 @@ public class Swiper : MonoBehaviour
         this.toggle = false;
     }
 
-    // float CalculateCrossingTime(Vector2 topLeft, Vector2 bottomRight, Vector2 outsidePoint, Vector2 insidePoint, float time)
-    // {
-    //     // Calculate the total distance traveled (using Pythagorean theorem)
-    //     double totalDistance = Math.Sqrt(Math.Pow(outsidePoint.x - insidePoint.x, 2) + Math.Pow(outsidePoint.y - insidePoint.y, 2));
-    //     // Speed = Distance / Time
-    //     double speed = totalDistance / Time.deltaTime;
-
-    // Calculate direction
-    // Then know which side you are crossing
-    // Then intersection
-    // We know it intersects so can do it faster maybe?
-    // and it is just an x or a y
-
-    //         // TODO Which box did a finish on? us that for distanceToFinishLine
-    //         // double distanceToFinishLine = Math.Sqrt(Math.Pow(point.x - this.previousPoint.x, 2) + Math.Pow(point.y - this.previousPoint.y, 2));
-
-    //         // time = distance / speed
-    //         // double finishLineTime = distanceToFinishLine / speed;
-    //         // TODO Convert this to a float
-    //         // Add it on
-
-    //         // Could do with a function
-    //         // bounding box
-    //         // pointA pointB
-    //         // time
-    //         // returns time of intersection
-
-    // }
-
     // Update is called once per frame
     void Update()
     {
@@ -123,7 +94,7 @@ public class Swiper : MonoBehaviour
         }
 
         // Left hit box
-        if (this.toggle == false && point.x > -7.25 && point.x < -4.75 && point.y > -1.25 && point.y < 1.25)
+        if (this.toggle == false && this.leftSpot.bounds.Contains(point))
         {
             this.toggle = true;
             this.rightSpot.color = this.white;
@@ -137,7 +108,7 @@ public class Swiper : MonoBehaviour
         }
 
         // Right hit box
-        if (this.toggle == true && point.x < 7.25 && point.x > 4.75 && point.y > -1.25 && point.y < 1.25)
+        if (this.toggle == true && this.rightSpot.bounds.Contains(point))
         {
             this.toggle = false;
             this.rightSpot.color = this.red;
@@ -145,7 +116,6 @@ public class Swiper : MonoBehaviour
 
             this.counter--;
         }
-
 
         // Timer
         if (timerStarted == true)
@@ -158,8 +128,8 @@ public class Swiper : MonoBehaviour
             {
                 // On devices we are stuck at 30fps (or near to it so Time.deltaTime will always be 0.033...) so calculate a more accurate time for
                 // the final delta
-                float timeCheck = this.timer + Time.deltaTime;
-                Debug.Log("Time would have been" + timeCheck);
+                double timeCheck = this.timer + Time.deltaTime;
+                Debug.Log("Time would have been " + timeCheck);
 
                 // Calculate the total distance traveled (using Pythagorean theorem)
                 double totalDistance = Math.Sqrt(Math.Pow(previousPoint.x - point.x, 2) + Math.Pow(previousPoint.y - point.y, 2));
@@ -169,7 +139,7 @@ public class Swiper : MonoBehaviour
                 // Speed = Distance / Time
                 double speed = totalDistance / Time.deltaTime;
 
-                // Find the distance travelled in that time
+                // Find the distance travelled when crossing in to the box
                 SpriteRenderer finalSpot = this.toggle == false ? this.rightSpot : this.leftSpot;
 
                 Bounds bounds = finalSpot.bounds;
@@ -191,7 +161,7 @@ public class Swiper : MonoBehaviour
 
                     this.timer += (float)time;
 
-                    Debug.Log("Time is" + this.timer);
+                    Debug.Log("Time is " + this.timer);
                 }
                 else
                 {
@@ -205,7 +175,7 @@ public class Swiper : MonoBehaviour
         }
 
         // Update UI
-        TimeSpan timespan = TimeSpan.FromSeconds(this.timer);
+        TimeSpan timespan = TimeSpan.FromSeconds(this.timer); // This TimeSpan is rounded to the nearest ms
 
         counterText.text = this.counter.ToString();
         timerText.text = timespan.ToString(@"mm\:ss\:fff");
