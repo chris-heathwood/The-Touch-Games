@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UIElements;
+using Helpers;
 
 public class Swiper : MonoBehaviour
 {
@@ -131,44 +132,11 @@ public class Swiper : MonoBehaviour
                 double timeCheck = this.timer + Time.deltaTime;
                 Debug.Log("Time would have been " + timeCheck);
 
-                // Calculate the total distance traveled (using Pythagorean theorem)
-                double totalDistance = Math.Sqrt(Math.Pow(previousPoint.x - point.x, 2) + Math.Pow(previousPoint.y - point.y, 2));
-
-                Debug.Log("Total distance: " + totalDistance);
-
-                // Speed = Distance / Time
-                double speed = totalDistance / Time.deltaTime;
-
-                // Find the distance travelled when crossing in to the box
                 SpriteRenderer finalSpot = this.toggle == false ? this.rightSpot : this.leftSpot;
 
-                Bounds bounds = finalSpot.bounds;
-                Vector2 direction = point - this.previousPoint;
-                Ray ray = new(previousPoint, direction);
+                this.timer += Timing.CalculateFinalDelta(finalSpot.bounds, previousPoint, point, Time.deltaTime);
 
-                Debug.Log("Previous point: " + this.previousPoint);
-                Debug.Log("Point: " + point);
-                Debug.Log("Direction: " + direction);
-
-                if (bounds.IntersectRay(ray, out float distance))
-                {
-                    Debug.Log("Collide Distance: " + distance);
-
-                    // Time = Distance / Speed
-                    double time = distance / speed;
-
-                    Debug.Log("Time to collision: " + time);
-
-                    this.timer += (float)time;
-
-                    Debug.Log("Time is " + this.timer);
-                }
-                else
-                {
-                    // The ray does not intersect the bounds
-                    Debug.Log("No intersection");
-                }
-
+                Debug.Log("Time actually is " + this.timer);
 
                 this.EndGame();
             }

@@ -83,39 +83,40 @@
         + ssh-keygen -t ed25519 -f ~/.ssh/personal-github -C "christopher.heathwood+github@gmail.com"
         + ssh-add --apple-use-keychain ~/.ssh/personal-github
         + pbcopy < ~/.ssh/personal-github.pub
-    - Get back to menu button
-        - Make this a long hold to get back
-    - Do the 3 versions
-        - Sprint
-        - Middle
-        - Marathon
-    - Timer 30fps rounding
-        - Fake the last set of ms
-        - It will always be a multiple of 0.033*
-        - 1.134
-        - Take the last point when we went in to the box
-            - | ----> |   *       |
-            - Work out how far away the point is from the collision point for the last swipe
-            - Adjust the last chunk of time accordingly?
-        - box
-            - topLeft
-            - bottomRight
-        - https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
-        - bounds.IntersectRay
+    + Timer 30fps rounding
+        + Fake the last set of ms
+        + It will always be a multiple of 0.033*
+        + 1.134
+        + Take the last point when we went in to the box
+            + | ----> |   *       |
+            + Work out how far away the point is from the collision point for the last swipe
+            + Adjust the last chunk of time accordingly?
+        + box
+            + topLeft
+            + bottomRight
+        + https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
+        + bounds.IntersectRay
             - This did it :thumbsup:
-        - vectors
-            - https://discussions.unity.com/t/create-a-vector-from-one-point-to-another-point/6510/2
-            - vSourceToDestination = vDestination - vSource;
+        + vectors
+            + https://discussions.unity.com/t/create-a-vector-from-one-point-to-another-point/6510/2
+            + vSourceToDestination = vDestination - vSource;
     - TODO
-        - Refactor code
-            - CalculateFinalDelta(bounds, outside, inside, delta)
-            - Use bounds.Contains
-                - For the Left/Right logic
-            - Make it an array of boxes?
+        + Add a note to this gist
+            + https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
+        + Common up the CalculateFinalDelta
+            + https://forum.unity.com/threads/new-to-scripting-how-to-set-up-a-function-library-class-definition-namespace.219103/
+            + https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/namespace?redirectedfrom=MSDN
+        + Refactor code?
+            + CalculateFinalDelta(bounds, outside, inside, delta)
+            + Use bounds.Contains
+                + For the Left/Right logic
+            - Make it an array of hit boxes?
                 - Then can handle more?
-        - Add a note to this gist
-            - https://gist.github.com/sinbad/68cb88e980eeaed0505210d052573724
-        - Common up the CalculateFinalDelta
-            - https://forum.unity.com/threads/new-to-scripting-how-to-set-up-a-function-library-class-definition-namespace.219103/
-            - https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/namespace?redirectedfrom=MSDN
-            - 
+        - Do we need the track?
+            - Maybe ditch it?
+        - Get back to menu button
+            - Make this a long hold to get back
+        - Do the 3 versions
+            - Sprint
+            - Middle
+            - Marathon
