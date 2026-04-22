@@ -448,10 +448,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuButton: {fileID: 1382850894}
   resetButton: {fileID: 787659041}
-  spots:
-  - {fileID: 2126931733}
-  - {fileID: 728734075}
-  totalSwipes: 100
+  leftSpot: {fileID: 2126931733}
+  rightSpot: {fileID: 728734075}
   counterText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
 --- !u!1 &538685122

@@ -56,5 +56,8 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Messing.sln"
+    "dotnet.defaultSolution": "Messing.sln",
+    "cSpell.words": [
+        "UGUI"
+    ]
 }

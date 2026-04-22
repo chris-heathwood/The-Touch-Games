@@ -1,42 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Menu : MonoBehaviour
 {
-    // Buttons
-    public UnityEngine.UI.Button swiperButton;
+    // Buttons using UnityEngine.UI.Button
+    public UnityEngine.UI.Button swiperSprintButton;
+    public UnityEngine.UI.Button swiperMiddleButton;
+    public UnityEngine.UI.Button swiperMarathonButton;
     public UnityEngine.UI.Button tapperButton;
 
-    // Text
+    // Text using TMPro.TextMeshProUGUI
     public TMPro.TextMeshProUGUI touchGames;
 
     private bool menuDisplayed = false;
-
     private float timer = 0;
 
-    // Start is called before the first frame update
     void Start()
     {
-        this.swiperButton.onClick.AddListener(() => SceneManager.LoadScene("Swiper"));
-        this.swiperButton.gameObject.SetActive(false);
-        this.tapperButton.gameObject.SetActive(false);
+        swiperSprintButton.onClick.AddListener(() => SceneManager.LoadScene("Swiper"));
+        swiperMiddleButton.onClick.AddListener(() => SceneManager.LoadScene("SwiperMiddle"));
+        swiperMarathonButton.onClick.AddListener(() => SceneManager.LoadScene("SwiperMarathon"));
+
+        swiperSprintButton.gameObject.SetActive(false);
+        swiperMiddleButton.gameObject.SetActive(false);
+        swiperMarathonButton.gameObject.SetActive(false);
+        tapperButton.gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (this.menuDisplayed == false && this.timer > 2) {
-            this.menuDisplayed = true;
+        if (!menuDisplayed && timer > 2)
+        {
+            menuDisplayed = true;
         }
 
-        if (this.menuDisplayed == true) {
-            this.swiperButton.gameObject.SetActive(true);
-            this.tapperButton.gameObject.SetActive(true);
-            this.touchGames.gameObject.SetActive(false);
-        } else {
-            this.timer += Time.deltaTime;
+        if (menuDisplayed)
+        {
+            swiperSprintButton.gameObject.SetActive(true);
+            swiperMiddleButton.gameObject.SetActive(true);
+            swiperMarathonButton.gameObject.SetActive(true);
+            tapperButton.gameObject.SetActive(true);
+            touchGames.gameObject.SetActive(false);
+        }
+        else
+        {
+            timer += Time.deltaTime;
         }
     }
 }

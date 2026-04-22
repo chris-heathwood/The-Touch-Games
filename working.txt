@@ -10,27 +10,29 @@
         - Balancer
         - Tracer
     - Event details
+        - Swiper
+            - Sprint Swiper
+                - 100 swipes
+                - Time between two spots (far apart for swiping)
+            - Middle distance Swiper
+                - 4 corners
+                - Swipe between
+                - 400 swipes
+                - SwiperMiddle
+            - Marathon Swiper
+                - 4 corners
+                - Swipe between
+                - 40000 swipes
+                - SwiperMarathon
+        - Tapper
+            - 100 taps
+            - Time between two spots (closer together so can be tapped)
         - Beeper
             - Drag finger between two points
             - Faster and faster
             - Until you don't make it
             - Threshold based on the timing
             - Not too early, not too late
-        - Tapper
-            - 100 taps
-            - Time between two spots (close together)
-        - Swiper
-            - Sprint Swiper
-                - 100 swipes
-                - Time between two spots (far apart together)
-            - Middle distance Swiper
-                - 4 corners
-                - Swipe between
-                - 400 swipes
-            - Marathon Swiper
-                - 4 corners
-                - Swipe between
-                - 40000 swipes
         - Rotator
             - Rotate 5 times
             - Get faster
