@@ -67,6 +67,22 @@ public class Swiper : MonoBehaviour
         }
     }
 
+    bool HasTouch()
+    {
+        if (runningInEditor)
+        {
+            return true;
+        }
+
+        return Input.touchCount == 1;
+    }
+
+    Vector2 TouchPoint()
+    {
+        Vector2 screenPoint = runningInEditor ? Input.mousePosition : Input.GetTouch(0).position;
+        return Camera.main.ScreenToWorldPoint(screenPoint);
+    }
+
     void Update()
     {
         if (timerFinished)
@@ -74,15 +90,11 @@ public class Swiper : MonoBehaviour
             return;
         }
 
-        Vector2 mousePosition = Input.mousePosition;
-        Vector2 point = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector2 point = TouchPoint();
 
-        // Touches (hopefully stops tapping hack or multi touch hacks)
-        if (!runningInEditor && timerStarted && Input.touchCount != 1)
+        if (!HasTouch())
         {
-            timer = 0;
-            timerStarted = false;
-            EndGame();
+            return;
         }
 
         if (spots[targetIndex].bounds.Contains(point))

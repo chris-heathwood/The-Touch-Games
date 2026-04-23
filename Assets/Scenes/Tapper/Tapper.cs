@@ -105,6 +105,10 @@ public class Tapper : MonoBehaviour
 
             if (counter == 0)
             {
+                // Tapper has no boundary crossing to interpolate against (unlike Swiper), so the final time
+                // is always a multiple of ~33ms at 30fps. Adding timer/10000 breaks the uniform rounding
+                // with a small deterministic offset derived from the player's actual run time.
+                timer += timer / 10000;
                 EndGame();
             }
         }
