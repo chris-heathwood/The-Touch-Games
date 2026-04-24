@@ -128,11 +128,11 @@ public class Beeper : MonoBehaviour
                     state = State.Ready;
                 }
             }
-            else
+            else if (timerStarted)
             {
-                // Finger left the spot before signal — reset
-                spots[currentSpot].color = white;
-                delayTimer = 0;
+                // Finger left the spot before signal — end game
+                state = State.Failed;
+                EndGame();
             }
         }
         else if (state == State.Ready)
