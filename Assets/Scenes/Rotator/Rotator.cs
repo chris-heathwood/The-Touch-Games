@@ -9,9 +9,9 @@ public class Rotator : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
-    // Canvases
-    public GameObject gaugeCanvas;
-    public GameObject rotatorCanvas;
+    // Root GameObjects for each phase — assign the empty parent GameObjects in Inspector
+    public GameObject gaugeElements;
+    public GameObject rotatorElements;
 
     // Gauge
     public PowerGauge powerGauge;
@@ -20,10 +20,6 @@ public class Rotator : MonoBehaviour
     public Transform ball;
     public Transform trackCenter;
     public float trackRadius = 3f;
-
-    // Markers at 10 o'clock (300 degrees) and 2 o'clock (60 degrees)
-    public Transform markerLeft;
-    public Transform markerRight;
 
     // Configure in Inspector
     public int totalRotations = 3;
@@ -60,10 +56,10 @@ public class Rotator : MonoBehaviour
         ResetGame();
     }
 
-    void ShowCanvas(State forState)
+    void ShowElements(State forState)
     {
-        gaugeCanvas.SetActive(forState == State.Gauge);
-        rotatorCanvas.SetActive(forState == State.Rotating || forState == State.Finished);
+        gaugeElements.SetActive(forState == State.Gauge);
+        rotatorElements.SetActive(forState == State.Rotating || forState == State.Finished);
     }
 
     void ResetGame()
@@ -78,7 +74,7 @@ public class Rotator : MonoBehaviour
         scoreText.text = "";
         powerGauge.Reset();
         UpdateBallPosition();
-        ShowCanvas(state);
+        ShowElements(state);
     }
 
     void EndGame(float score)
@@ -137,16 +133,16 @@ public class Rotator : MonoBehaviour
                 state = State.Rotating;
                 currentRotation = 1;
                 rotationCountText.text = currentRotation.ToString();
-                ShowCanvas(state);
+                ShowElements(state);
             }
         }
         else if (state == State.Rotating)
         {
             float previousAngle = currentAngle;
-            currentAngle += currentSpeed * Time.deltaTime;
+            currentAngle -= currentSpeed * Time.deltaTime;
 
             // Check if we completed a rotation
-            float rotationsDone = (currentAngle - 270f) / 360f;
+            float rotationsDone = (270f - currentAngle) / 360f;
             if (rotationsDone >= currentRotation)
             {
                 if (currentRotation < totalRotations)
@@ -158,6 +154,30 @@ public class Rotator : MonoBehaviour
             }
 
             UpdateBallPosition();
+
+            // Tapping in the zone on an early rotation ends the game
+            if (currentRotation < totalRotations && TapThisFrame())
+            {
+                float earlyNormalised = (((-currentAngle) % 360f) + 360f) % 360f;
+                if (AccuracyScore(earlyNormalised) > 0f)
+                {
+                    EndGame(0f);
+                    return;
+                }
+            }
+
+            // On final rotation, end game if ball passes through zone without a tap
+            if (currentRotation == totalRotations)
+            {
+                float prevNormalised = (((-currentAngle + currentSpeed * Time.deltaTime) % 360f) + 360f) % 360f;
+                float currNormalised = (((-currentAngle) % 360f) + 360f) % 360f;
+                bool passedZone = prevNormalised < 90f && currNormalised >= 90f;
+                if (passedZone && !TapThisFrame())
+                {
+                    EndGame(0f);
+                    return;
+                }
+            }
 
             // Only accept tap on the final rotation
             if (currentRotation == totalRotations && TapThisFrame())
