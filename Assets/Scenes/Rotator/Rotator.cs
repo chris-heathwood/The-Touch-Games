@@ -29,9 +29,8 @@ public class Rotator : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     // Fixed acceleration curve — same every run
-    // Base speed in degrees/second for rotation 1, multiplied each rotation
-    public float baseSpeed = 90f;
-    public float speedIncreasePerRotation = 1.4f;
+    public float baseSpeed = 60f;
+    public float acceleration = 20f; // degrees/second added per second
 
     private enum State { Gauge, Rotating, Finished }
     private State state;
@@ -138,7 +137,7 @@ public class Rotator : MonoBehaviour
         }
         else if (state == State.Rotating)
         {
-            float previousAngle = currentAngle;
+            currentSpeed += acceleration * Time.deltaTime;
             currentAngle -= currentSpeed * Time.deltaTime;
 
             // Check if we completed a rotation
@@ -148,22 +147,17 @@ public class Rotator : MonoBehaviour
                 if (currentRotation < totalRotations)
                 {
                     currentRotation++;
-                    currentSpeed *= speedIncreasePerRotation;
                     rotationCountText.text = currentRotation.ToString();
                 }
             }
 
             UpdateBallPosition();
 
-            // Tapping in the zone on an early rotation ends the game
+            // Any tap before the final rotation ends the game
             if (currentRotation < totalRotations && TapThisFrame())
             {
-                float earlyNormalised = (((-currentAngle) % 360f) + 360f) % 360f;
-                if (AccuracyScore(earlyNormalised) > 0f)
-                {
-                    EndGame(0f);
-                    return;
-                }
+                EndGame(0f);
+                return;
             }
 
             // On final rotation, end game if ball passes through zone without a tap
