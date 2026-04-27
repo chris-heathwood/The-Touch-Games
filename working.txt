@@ -37,9 +37,13 @@
             - Rotate 5 times
             - Get faster
             - Release between the arcs
+            - Gauge goes up and down (this is the power)
+                - Hit in red zone
+            - Green ball rotates around an axis
+                - Get between the markers
         - Timer
             - 5 random beats to hit
-            - 5th time hold and hit fast marker
+            - 5th time hold and hit gauge same as Rotator
         - Balancer
             - 2 fingers
             - Drag back
