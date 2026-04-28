@@ -60,9 +60,8 @@ public class Tracer : MonoBehaviour
 
     // Shooter state
     private int currentTarget = 0;
-    private float orbitAngle = 0f;
-    private float jitterAngle = 0f;
-    private float jitterVelocity = 0f;
+    private Vector2 aimPosition;
+    private Vector2 aimVelocity;
     private float steadyGauge = 1f;
     private bool isSteadying = false;
     private float shooterScore = 0f;
@@ -125,9 +124,8 @@ public class Tracer : MonoBehaviour
         nextGate = 1;           // start at gate 1 — player begins at left (gate 0)
         direction = 0;
         currentTarget = 0;
-        orbitAngle = 0f;
-        jitterAngle = 0f;
-        jitterVelocity = 0f;
+        aimPosition = Vector2.zero;
+        aimVelocity = Vector2.zero;
         steadyGauge = 1f;
         isSteadying = false;
         shooterScore = 0f;
@@ -190,7 +188,8 @@ public class Tracer : MonoBehaviour
         else
         {
             violetCircles[currentTarget].gameObject.SetActive(true);
-            jitterVelocity = 0f;
+            aimPosition = violetCircles[currentTarget].position;
+            aimVelocity = Vector2.zero;
         }
     }
 
@@ -291,6 +290,8 @@ public class Tracer : MonoBehaviour
                     tracerElements.SetActive(false);
                     shooterElements.SetActive(true);
                     violetCircles[0].gameObject.SetActive(true);
+                    aimPosition = violetCircles[0].position;
+                    aimVelocity = Vector2.zero;
                     state = State.Shooting;
                 }
             }
@@ -310,7 +311,10 @@ public class Tracer : MonoBehaviour
             }
         }
 
-        isSteadying = InputHeld() && steadySprite.bounds.Contains(point);
+        bool heldOnSteady = InputHeld() && steadySprite.bounds.Contains(point);
+        isSteadying = runningInEditor
+            ? heldOnSteady || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
+            : heldOnSteady;
 
         if (isSteadying && steadyGauge > 0f)
         {
@@ -318,23 +322,33 @@ public class Tracer : MonoBehaviour
         }
 
         Vector3 gaugeScale = steadyGaugeFill.transform.localScale;
-        gaugeScale.x = steadyGauge;
+        gaugeScale.y = steadyGauge;
         steadyGaugeFill.transform.localScale = gaugeScale;
 
-        orbitAngle += orbitSpeed * Time.deltaTime;
+        // Aim wanders randomly across the target; steady slows it down
+        bool steadyActive = isSteadying && steadyGauge > 0f;
+        float noise = steadyActive ? jitterSpeed * jitterReduction : jitterSpeed;
 
-        float effectiveJitter = isSteadying && steadyGauge > 0f ? jitterSpeed * jitterReduction : jitterSpeed;
-        jitterVelocity += UnityEngine.Random.Range(-effectiveJitter, effectiveJitter) * Time.deltaTime;
-        jitterVelocity = Mathf.Clamp(jitterVelocity, -jitterSpeed, jitterSpeed);
-        jitterAngle += jitterVelocity * Time.deltaTime;
+        // Natural velocity decay — steady kills it fast, unsteady lets it drift
+        float decay = steadyActive ? 0.01f : 0.4f;
+        aimVelocity *= Mathf.Pow(decay, Time.deltaTime);
 
-        float totalAngle = (orbitAngle + jitterAngle) * Mathf.Deg2Rad;
-        Vector3 targetPos = violetCircles[currentTarget].position;
-        whiteCircle.position = targetPos + new Vector3(
-            Mathf.Cos(totalAngle) * orbitRadius,
-            Mathf.Sin(totalAngle) * orbitRadius,
-            0f
-        );
+        aimVelocity.x += UnityEngine.Random.Range(-noise, noise) * Time.deltaTime;
+        aimVelocity.y += UnityEngine.Random.Range(-noise, noise) * Time.deltaTime;
+        aimVelocity = Vector2.ClampMagnitude(aimVelocity, orbitSpeed);
+
+        aimPosition += aimVelocity * Time.deltaTime;
+
+        // Elastic boundary — keep aim within wander radius of the target
+        Vector2 center = violetCircles[currentTarget].position;
+        Vector2 drift = aimPosition - center;
+        if (drift.magnitude > orbitRadius)
+        {
+            aimVelocity -= drift.normalized * noise * Time.deltaTime;
+            aimPosition = center + drift.normalized * orbitRadius;
+        }
+
+        whiteCircle.position = new Vector3(aimPosition.x, aimPosition.y, 0f);
     }
 
     void Update()
