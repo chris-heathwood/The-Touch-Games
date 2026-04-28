@@ -22,6 +22,7 @@ public class Tracer : MonoBehaviour
     public LineRenderer trackLine;
     public Transform fingerMarker;
     public float pathThreshold = 0.5f;
+    public float gateRadius = 0.8f;     // how close to a gate to trigger it
     public int lapsRequired = 5;
 
     // Shooter
@@ -41,12 +42,21 @@ public class Tracer : MonoBehaviour
     private enum State { Tracing, Shooting, Finished }
     private State state;
 
-    // Tracer state
+    // Path
     private List<Vector2> pathPoints = new();
+    private float scaleX = 6f;
+    private float scaleY = 3f;
+
+    // Gates — player must hit in order: left → centerA → right → centerB → lap
+    // centerA and centerB are the same position but approached from opposite sides
+    private Vector2[] gates;
+    private int nextGate = 0;
+    private int direction = 0;          // 0 = undecided, 1 = clockwise, -1 = counter
+
+    // Tracer state
     private double tracerTimer = 0;
     private bool tracingStarted = false;
     private int lapsCompleted = 0;
-    private float lastProgress = 0f;
 
     // Shooter state
     private int currentTarget = 0;
@@ -75,12 +85,11 @@ public class Tracer : MonoBehaviour
     {
         pathPoints.Clear();
         int pointCount = 200;
-        float scaleX = 3f;
-        float scaleY = 1.5f;
+        int overlapCount = 6; // extra points past the full cycle to hide the seam
 
-        for (int i = 0; i <= pointCount; i++)
+        for (int i = 0; i <= pointCount + overlapCount; i++)
         {
-            float t = (i / (float)pointCount) * 2f * Mathf.PI;
+            float t = (i / (float)pointCount) * 2f * Mathf.PI + Mathf.PI;
             float denom = 1f + Mathf.Sin(t) * Mathf.Sin(t);
             float x = scaleX * Mathf.Cos(t) / denom;
             float y = scaleY * Mathf.Sin(t) * Mathf.Cos(t) / denom;
@@ -88,10 +97,23 @@ public class Tracer : MonoBehaviour
         }
 
         trackLine.positionCount = pathPoints.Count;
+        trackLine.loop = false;
         for (int i = 0; i < pathPoints.Count; i++)
         {
             trackLine.SetPosition(i, new Vector3(pathPoints[i].x, pathPoints[i].y, 0f));
         }
+
+        // Gates: left, center (going right), right, center (going left)
+        gates = new Vector2[]
+        {
+            new(-scaleX, 0f),    // gate 0: left extreme — start/finish
+            new(0f, 0f),         // gate 1: center first pass
+            new(scaleX, 0f),     // gate 2: right extreme
+            new(0f, 0f),         // gate 3: center second pass
+        };
+
+        if (fingerMarker != null)
+            fingerMarker.position = new Vector3(-scaleX, 0f, 0f);
     }
 
     void ResetGame()
@@ -100,7 +122,8 @@ public class Tracer : MonoBehaviour
         tracerTimer = 0;
         tracingStarted = false;
         lapsCompleted = 0;
-        lastProgress = 0f;
+        nextGate = 1;           // start at gate 1 — player begins at left (gate 0)
+        direction = 0;
         currentTarget = 0;
         orbitAngle = 0f;
         jitterAngle = 0f;
@@ -116,6 +139,9 @@ public class Tracer : MonoBehaviour
         tracerElements.SetActive(true);
         shooterElements.SetActive(false);
 
+        if (fingerMarker != null)
+            fingerMarker.position = new Vector3(-scaleX, 0f, 0f);
+
         foreach (var c in violetCircles) c.gameObject.SetActive(false);
     }
 
@@ -128,23 +154,15 @@ public class Tracer : MonoBehaviour
         state = State.Finished;
     }
 
-    float GetPathProgress(Vector2 point, out float distanceToPath)
+    float DistanceToPath(Vector2 point)
     {
         float minDist = float.MaxValue;
-        int nearestIndex = 0;
-
         for (int i = 0; i < pathPoints.Count; i++)
         {
             float d = Vector2.Distance(point, pathPoints[i]);
-            if (d < minDist)
-            {
-                minDist = d;
-                nearestIndex = i;
-            }
+            if (d < minDist) minDist = d;
         }
-
-        distanceToPath = minDist;
-        return nearestIndex / (float)(pathPoints.Count - 1);
+        return minDist;
     }
 
     void Shoot()
@@ -207,17 +225,17 @@ public class Tracer : MonoBehaviour
         if (fingerMarker != null)
             fingerMarker.position = new Vector3(point.x, point.y, 0f);
 
-        float distToPath;
-        float progress = GetPathProgress(point, out distToPath);
-
         if (!tracingStarted)
         {
-            tracingStarted = true;
-            lastProgress = progress;
+            // Only start if near the left gate
+            if (Vector2.Distance(point, gates[0]) <= gateRadius)
+            {
+                tracingStarted = true;
+            }
             return;
         }
 
-        if (distToPath > pathThreshold)
+        if (DistanceToPath(point) > pathThreshold)
         {
             scoreText.text = "0";
             menuButton.gameObject.SetActive(true);
@@ -228,30 +246,61 @@ public class Tracer : MonoBehaviour
 
         tracerTimer += Time.deltaTime;
 
-        float progressDelta = progress - lastProgress;
-        if (progressDelta < -0.5f)
+        // First center gate — lock direction on first lap, enforce it on subsequent laps
+        if (nextGate == 1)
         {
-            lapsCompleted++;
-            lapCountText.text = lapsCompleted.ToString();
-
-            if (lapsCompleted >= lapsRequired)
+            if (Vector2.Distance(point, gates[1]) <= gateRadius)
             {
-                tracerScore = Mathf.Max(0f, 1000f - (float)tracerTimer * 10f);
-                tracerElements.SetActive(false);
-                shooterElements.SetActive(true);
-                violetCircles[0].gameObject.SetActive(true);
-                state = State.Shooting;
+                if (direction == 0)
+                {
+                    direction = point.y > 0 ? 1 : -1;
+                    nextGate = 2;
+                }
+                else if ((direction == 1 && point.y > 0) || (direction == -1 && point.y < 0))
+                {
+                    nextGate = 2;
+                }
             }
         }
+        else if (nextGate == 2)
+        {
+            if (Vector2.Distance(point, gates[2]) <= gateRadius)
+                nextGate = 3;
+        }
+        else if (nextGate == 3)
+        {
+            if (Vector2.Distance(point, gates[3]) <= gateRadius)
+            {
+                // Must approach center from opposite side to first pass
+                bool validApproach = direction == 1 ? point.y < 0 : point.y > 0;
+                if (validApproach)
+                    nextGate = 4;
+            }
+        }
+        else if (nextGate == 4)
+        {
+            if (Vector2.Distance(point, gates[0]) <= gateRadius)
+            {
+                lapsCompleted++;
+                lapCountText.text = lapsCompleted.ToString();
+                nextGate = 1;
 
-        lastProgress = progress;
+                if (lapsCompleted >= lapsRequired)
+                {
+                    tracerScore = Mathf.Max(0f, 1000f - (float)tracerTimer * 10f);
+                    tracerElements.SetActive(false);
+                    shooterElements.SetActive(true);
+                    violetCircles[0].gameObject.SetActive(true);
+                    state = State.Shooting;
+                }
+            }
+        }
     }
 
     void UpdateShooter()
     {
         Vector2 point = InputPosition();
 
-        // Check sprite button taps
         if (TapThisFrame())
         {
             if (shootSprite.bounds.Contains(point))
@@ -261,7 +310,6 @@ public class Tracer : MonoBehaviour
             }
         }
 
-        // Steady while finger is held on steady sprite
         isSteadying = InputHeld() && steadySprite.bounds.Contains(point);
 
         if (isSteadying && steadyGauge > 0f)
@@ -269,12 +317,10 @@ public class Tracer : MonoBehaviour
             steadyGauge = Mathf.Max(0f, steadyGauge - steadyDrain * Time.deltaTime);
         }
 
-        // Update gauge visual
         Vector3 gaugeScale = steadyGaugeFill.transform.localScale;
         gaugeScale.x = steadyGauge;
         steadyGaugeFill.transform.localScale = gaugeScale;
 
-        // Orbit white circle around current target with jitter
         orbitAngle += orbitSpeed * Time.deltaTime;
 
         float effectiveJitter = isSteadying && steadyGauge > 0f ? jitterSpeed * jitterReduction : jitterSpeed;
