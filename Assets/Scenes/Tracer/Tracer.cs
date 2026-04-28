@@ -1,0 +1,301 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
+
+public class Tracer : MonoBehaviour
+{
+    // Menu/Reset buttons (UI)
+    public UnityEngine.UI.Button menuButton;
+    public UnityEngine.UI.Button resetButton;
+
+    // Shooter sprite buttons
+    public SpriteRenderer steadySprite;
+    public SpriteRenderer shootSprite;
+
+    // Elements
+    public GameObject tracerElements;
+    public GameObject shooterElements;
+
+    // Tracer
+    public LineRenderer trackLine;
+    public Transform fingerMarker;
+    public float pathThreshold = 0.5f;
+    public int lapsRequired = 5;
+
+    // Shooter
+    public Transform[] violetCircles;
+    public Transform whiteCircle;
+    public SpriteRenderer steadyGaugeFill;
+    public float orbitRadius = 1f;
+    public float orbitSpeed = 90f;
+    public float jitterSpeed = 45f;
+    public float steadyDrain = 0.3f;
+    public float jitterReduction = 0.8f;
+
+    // Text
+    public TextMeshProUGUI lapCountText;
+    public TextMeshProUGUI scoreText;
+
+    private enum State { Tracing, Shooting, Finished }
+    private State state;
+
+    // Tracer state
+    private List<Vector2> pathPoints = new();
+    private double tracerTimer = 0;
+    private bool tracingStarted = false;
+    private int lapsCompleted = 0;
+    private float lastProgress = 0f;
+
+    // Shooter state
+    private int currentTarget = 0;
+    private float orbitAngle = 0f;
+    private float jitterAngle = 0f;
+    private float jitterVelocity = 0f;
+    private float steadyGauge = 1f;
+    private bool isSteadying = false;
+    private float shooterScore = 0f;
+    private float tracerScore = 0f;
+
+    private bool runningInEditor = false;
+
+    void Start()
+    {
+        if (Application.isEditor) runningInEditor = true;
+
+        menuButton.onClick.AddListener(() => SceneManager.LoadScene("Menu"));
+        resetButton.onClick.AddListener(() => ResetGame());
+
+        GenerateFigureOfEightPath();
+        ResetGame();
+    }
+
+    void GenerateFigureOfEightPath()
+    {
+        pathPoints.Clear();
+        int pointCount = 200;
+        float scaleX = 3f;
+        float scaleY = 1.5f;
+
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float t = (i / (float)pointCount) * 2f * Mathf.PI;
+            float denom = 1f + Mathf.Sin(t) * Mathf.Sin(t);
+            float x = scaleX * Mathf.Cos(t) / denom;
+            float y = scaleY * Mathf.Sin(t) * Mathf.Cos(t) / denom;
+            pathPoints.Add(new Vector2(x, y));
+        }
+
+        trackLine.positionCount = pathPoints.Count;
+        for (int i = 0; i < pathPoints.Count; i++)
+        {
+            trackLine.SetPosition(i, new Vector3(pathPoints[i].x, pathPoints[i].y, 0f));
+        }
+    }
+
+    void ResetGame()
+    {
+        state = State.Tracing;
+        tracerTimer = 0;
+        tracingStarted = false;
+        lapsCompleted = 0;
+        lastProgress = 0f;
+        currentTarget = 0;
+        orbitAngle = 0f;
+        jitterAngle = 0f;
+        jitterVelocity = 0f;
+        steadyGauge = 1f;
+        isSteadying = false;
+        shooterScore = 0f;
+        tracerScore = 0f;
+        lapCountText.text = "0";
+        scoreText.text = "";
+        menuButton.gameObject.SetActive(false);
+        resetButton.gameObject.SetActive(false);
+        tracerElements.SetActive(true);
+        shooterElements.SetActive(false);
+
+        foreach (var c in violetCircles) c.gameObject.SetActive(false);
+    }
+
+    void EndGame()
+    {
+        float finalScore = tracerScore + shooterScore;
+        scoreText.text = Mathf.RoundToInt(finalScore).ToString();
+        menuButton.gameObject.SetActive(true);
+        resetButton.gameObject.SetActive(true);
+        state = State.Finished;
+    }
+
+    float GetPathProgress(Vector2 point, out float distanceToPath)
+    {
+        float minDist = float.MaxValue;
+        int nearestIndex = 0;
+
+        for (int i = 0; i < pathPoints.Count; i++)
+        {
+            float d = Vector2.Distance(point, pathPoints[i]);
+            if (d < minDist)
+            {
+                minDist = d;
+                nearestIndex = i;
+            }
+        }
+
+        distanceToPath = minDist;
+        return nearestIndex / (float)(pathPoints.Count - 1);
+    }
+
+    void Shoot()
+    {
+        if (state != State.Shooting) return;
+
+        Vector2 whitePos = whiteCircle.position;
+        Vector2 targetPos = violetCircles[currentTarget].position;
+        float dist = Vector2.Distance(whitePos, targetPos);
+        float targetRadius = violetCircles[currentTarget].localScale.x * 0.5f;
+
+        if (dist <= targetRadius)
+        {
+            float accuracy = 1f - (dist / targetRadius);
+            shooterScore += accuracy * 100f;
+        }
+
+        violetCircles[currentTarget].gameObject.SetActive(false);
+        currentTarget++;
+
+        if (currentTarget >= violetCircles.Length)
+        {
+            EndGame();
+        }
+        else
+        {
+            violetCircles[currentTarget].gameObject.SetActive(true);
+            jitterVelocity = 0f;
+        }
+    }
+
+    Vector2 InputPosition()
+    {
+        Vector2 screenPos = runningInEditor ? Input.mousePosition : Input.GetTouch(0).position;
+        return Camera.main.ScreenToWorldPoint(screenPos);
+    }
+
+    bool InputHeld()
+    {
+        if (runningInEditor) return Input.GetMouseButton(0);
+        return Input.touchCount == 1;
+    }
+
+    bool TapThisFrame()
+    {
+        if (runningInEditor) return Input.GetMouseButtonDown(0);
+        return Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
+    }
+
+    void UpdateTracer()
+    {
+        if (!InputHeld())
+        {
+            tracingStarted = false;
+            return;
+        }
+
+        Vector2 point = InputPosition();
+
+        if (fingerMarker != null)
+            fingerMarker.position = new Vector3(point.x, point.y, 0f);
+
+        float distToPath;
+        float progress = GetPathProgress(point, out distToPath);
+
+        if (!tracingStarted)
+        {
+            tracingStarted = true;
+            lastProgress = progress;
+            return;
+        }
+
+        if (distToPath > pathThreshold)
+        {
+            scoreText.text = "0";
+            menuButton.gameObject.SetActive(true);
+            resetButton.gameObject.SetActive(true);
+            state = State.Finished;
+            return;
+        }
+
+        tracerTimer += Time.deltaTime;
+
+        float progressDelta = progress - lastProgress;
+        if (progressDelta < -0.5f)
+        {
+            lapsCompleted++;
+            lapCountText.text = lapsCompleted.ToString();
+
+            if (lapsCompleted >= lapsRequired)
+            {
+                tracerScore = Mathf.Max(0f, 1000f - (float)tracerTimer * 10f);
+                tracerElements.SetActive(false);
+                shooterElements.SetActive(true);
+                violetCircles[0].gameObject.SetActive(true);
+                state = State.Shooting;
+            }
+        }
+
+        lastProgress = progress;
+    }
+
+    void UpdateShooter()
+    {
+        Vector2 point = InputPosition();
+
+        // Check sprite button taps
+        if (TapThisFrame())
+        {
+            if (shootSprite.bounds.Contains(point))
+            {
+                Shoot();
+                return;
+            }
+        }
+
+        // Steady while finger is held on steady sprite
+        isSteadying = InputHeld() && steadySprite.bounds.Contains(point);
+
+        if (isSteadying && steadyGauge > 0f)
+        {
+            steadyGauge = Mathf.Max(0f, steadyGauge - steadyDrain * Time.deltaTime);
+        }
+
+        // Update gauge visual
+        Vector3 gaugeScale = steadyGaugeFill.transform.localScale;
+        gaugeScale.x = steadyGauge;
+        steadyGaugeFill.transform.localScale = gaugeScale;
+
+        // Orbit white circle around current target with jitter
+        orbitAngle += orbitSpeed * Time.deltaTime;
+
+        float effectiveJitter = isSteadying && steadyGauge > 0f ? jitterSpeed * jitterReduction : jitterSpeed;
+        jitterVelocity += UnityEngine.Random.Range(-effectiveJitter, effectiveJitter) * Time.deltaTime;
+        jitterVelocity = Mathf.Clamp(jitterVelocity, -jitterSpeed, jitterSpeed);
+        jitterAngle += jitterVelocity * Time.deltaTime;
+
+        float totalAngle = (orbitAngle + jitterAngle) * Mathf.Deg2Rad;
+        Vector3 targetPos = violetCircles[currentTarget].position;
+        whiteCircle.position = targetPos + new Vector3(
+            Mathf.Cos(totalAngle) * orbitRadius,
+            Mathf.Sin(totalAngle) * orbitRadius,
+            0f
+        );
+    }
+
+    void Update()
+    {
+        if (state == State.Finished) return;
+
+        if (state == State.Tracing) UpdateTracer();
+        else if (state == State.Shooting) UpdateShooter();
+    }
+}
