@@ -17,17 +17,15 @@ public class Balancer : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     // Tuning
-    public float maxAngle = 30f;          // degrees either side before game over
-    public float tiltStrength = 5f;       // initial tilt impulse strength
-    public float tiltInterval = 2f;       // seconds between tilt impulses
-    public float tiltEscalation = 0.1f;   // added to tiltStrength each impulse
-    public float correctionSpeed = 60f;   // degrees/second the pivot drag can correct
-    public float dragRange = 3f;          // world units the pivot can be dragged across
+    public float maxAngle = 30f;           // degrees either side before game over
+    public float initialDriftSpeed = 3f;   // degrees/second the pole drifts at start
+    public float driftEscalation = 0.5f;   // degrees/second added to drift speed per second
+    public float correctionSpeed = 60f;    // degrees/second the pivot drag can correct
+    public float dragRange = 3f;           // world units the pivot can be dragged across
 
     private float currentAngle = 0f;
-    private float tiltTimer = 0f;
-    private float nextTiltAt = 0f;
-    private float currentTiltForce = 0f;
+    private float currentDriftSpeed = 0f;
+    private float driftDirection = 1f;
     private double timer = 0;
     private bool gameStarted = false;
     private bool gameOver = false;
@@ -56,9 +54,8 @@ public class Balancer : MonoBehaviour
     void ResetGame()
     {
         currentAngle = 0f;
-        tiltTimer = 0f;
-        nextTiltAt = tiltInterval;
-        currentTiltForce = tiltStrength;
+        currentDriftSpeed = initialDriftSpeed;
+        driftDirection = UnityEngine.Random.value > 0.5f ? 1f : -1f;
         timer = 0;
         gameStarted = false;
         gameOver = false;
@@ -134,26 +131,15 @@ public class Balancer : MonoBehaviour
 
         timer += Time.deltaTime;
 
-        // Scripted tilt impulses
-        tiltTimer += Time.deltaTime;
-        if (tiltTimer >= nextTiltAt)
-        {
-            tiltTimer = 0f;
-            nextTiltAt = tiltInterval;
-            // Random direction, escalating strength
-            float direction = UnityEngine.Random.value > 0.5f ? 1f : -1f;
-            currentTiltForce += tiltEscalation;
-            currentAngle += direction * currentTiltForce;
-        }
+        // Continuous drift in one direction, escalating over time
+        currentDriftSpeed += driftEscalation * Time.deltaTime;
+        currentAngle += driftDirection * currentDriftSpeed * Time.deltaTime;
 
         // Pivot correction — offset from centre pulls angle back toward vertical
         float correction = -pivotX * (correctionSpeed * Time.deltaTime);
         currentAngle += correction;
 
-        // Passive drift back toward current tilt (gravity-like)
-        currentAngle = Mathf.MoveTowards(currentAngle, currentAngle > 0 ? currentAngle + 0.5f : currentAngle - 0.5f, Time.deltaTime * 2f);
-
-        currentAngle = Mathf.Clamp(currentAngle, -maxAngle * 2f, maxAngle * 2f);
+currentAngle = Mathf.Clamp(currentAngle, -maxAngle * 2f, maxAngle * 2f);
 
         ApplyAngle();
 
