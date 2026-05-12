@@ -15,6 +15,24 @@ EditorBuildSettings:
     path: Assets/Scenes/Swiper/SwiperMiddle.unity
     guid: 85b838a73ad064ebe9ce1a01879547bd
   - enabled: 1
-    path: Assets/Scenes/SwiperMarathon.unity
-    guid: fdb685bf9f99943c3b61bc943abbd5a4
+    path: Assets/Scenes/Balancer/Balancer.unity
+    guid: 930d7963c04644526aa0866f30f21ca0
+  - enabled: 1
+    path: Assets/Scenes/Beeper/Beeper.unity
+    guid: 21a796cbafc66410db33f1f427a5b0b0
+  - enabled: 1
+    path: Assets/Scenes/Rotator/Rotator.unity
+    guid: 5f2103e7b7f334ff192e2d3b206fb343
+  - enabled: 1
+    path: Assets/Scenes/Swiper/SwiperMarathon.unity
+    guid: f06f02dcbbbfa447fa51b3a968ae3d8f
+  - enabled: 1
+    path: Assets/Scenes/Tapper/Tapper.unity
+    guid: fefade60b66814acba460fadf3ed3816
+  - enabled: 1
+    path: Assets/Scenes/Timer/Timer.unity
+    guid: d6670238bd3374b529035ffbbd2a48eb
+  - enabled: 1
+    path: Assets/Scenes/Tracer/Tracer.unity
+    guid: a496444b25c264885b661ed4c614cb7d
   m_configObjects: {}

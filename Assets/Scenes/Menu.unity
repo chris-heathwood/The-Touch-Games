@@ -2323,6 +2323,11 @@ MonoBehaviour:
   swiperMiddleButton: {fileID: 347711317}
   swiperMarathonButton: {fileID: 1294897550}
   tapperButton: {fileID: 1284704623}
+  beeperButton: {fileID: 1712086759}
+  rotatorButton: {fileID: 28784423}
+  timerButton: {fileID: 1005696672}
+  balancerButton: {fileID: 1969377536}
+  tracerButton: {fileID: 651008741}
   touchGames: {fileID: 1597423282}
 --- !u!1 &1485874025
 GameObject:
