@@ -23,6 +23,7 @@ public class Splash : MonoBehaviour
     private float phaseTimer = 0f;
     private float angle = 0f;
     private float currentRadius;
+    private Quaternion[] startRotations;
 
     private Color red   = new(0.96f, 0.03f, 0.03f, 1f);
     private Color green = new(0.169f, 0.965f, 0.047f, 1f);
@@ -69,6 +70,9 @@ public class Splash : MonoBehaviour
                 Color b = Color.Lerp(blue,  white, t);
                 SetColors(r, g, b);
                 UpdateOrbit(currentRadius);
+                thumbRed.transform.rotation   = Quaternion.Slerp(startRotations[0], Quaternion.identity, t);
+                thumbGreen.transform.rotation = Quaternion.Slerp(startRotations[1], Quaternion.identity, t);
+                thumbBlue.transform.rotation  = Quaternion.Slerp(startRotations[2], Quaternion.identity, t);
                 if (t >= 1f) NextPhase();
                 break;
             }
@@ -150,6 +154,14 @@ public class Splash : MonoBehaviour
         phase++;
         phaseTimer = 0f;
         if (phase == Phase.Converge)
+        {
             currentRadius = orbitRadius;
+            startRotations = new Quaternion[]
+            {
+                thumbRed.transform.rotation,
+                thumbGreen.transform.rotation,
+                thumbBlue.transform.rotation
+            };
+        }
     }
 }
