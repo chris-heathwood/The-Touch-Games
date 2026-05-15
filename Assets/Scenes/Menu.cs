@@ -13,10 +13,10 @@ public class Menu : MonoBehaviour
     public UnityEngine.UI.Button balancerButton;
     public UnityEngine.UI.Button tracerButton;
 
-    public TMPro.TextMeshProUGUI touchGames;
+    public CanvasGroup fadeOverlay;
+    public float fadeInDuration = 0.5f;
 
-    private bool menuDisplayed = false;
-    private float timer = 0;
+    private float fadeTimer = 0f;
 
     void Start()
     {
@@ -30,40 +30,14 @@ public class Menu : MonoBehaviour
         balancerButton.onClick.AddListener(() => SceneManager.LoadScene("Balancer"));
         tracerButton.onClick.AddListener(() => SceneManager.LoadScene("Tracer"));
 
-        swiperSprintButton.gameObject.SetActive(false);
-        swiperMiddleButton.gameObject.SetActive(false);
-        swiperMarathonButton.gameObject.SetActive(false);
-        tapperButton.gameObject.SetActive(false);
-        beeperButton.gameObject.SetActive(false);
-        rotatorButton.gameObject.SetActive(false);
-        timerButton.gameObject.SetActive(false);
-        balancerButton.gameObject.SetActive(false);
-        tracerButton.gameObject.SetActive(false);
+        if (fadeOverlay != null) fadeOverlay.alpha = 1f;
     }
 
     void Update()
     {
-        if (!menuDisplayed && timer > 2)
-        {
-            menuDisplayed = true;
-        }
+        if (fadeOverlay == null || fadeOverlay.alpha <= 0f) return;
 
-        if (menuDisplayed)
-        {
-            swiperSprintButton.gameObject.SetActive(true);
-            swiperMiddleButton.gameObject.SetActive(true);
-            swiperMarathonButton.gameObject.SetActive(true);
-            tapperButton.gameObject.SetActive(true);
-            beeperButton.gameObject.SetActive(true);
-            rotatorButton.gameObject.SetActive(true);
-            timerButton.gameObject.SetActive(true);
-            balancerButton.gameObject.SetActive(true);
-            tracerButton.gameObject.SetActive(true);
-            touchGames.gameObject.SetActive(false);
-        }
-        else
-        {
-            timer += Time.deltaTime;
-        }
+        fadeTimer += Time.deltaTime;
+        fadeOverlay.alpha = Mathf.Clamp01(1f - fadeTimer / fadeInDuration);
     }
 }

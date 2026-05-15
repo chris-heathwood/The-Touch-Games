@@ -20,10 +20,13 @@ public class Swiper : MonoBehaviour
     public TextMeshProUGUI counterText;
     public TextMeshProUGUI timerText;
 
+    public float pauseTimeout = 5f;
+
     private int counter;
     private int targetIndex = 0;
     private Vector2 previousPoint;
     private double timer = 0;
+    private float pauseTimer = 0f;
     private bool timerStarted = false;
     private bool timerFinished = false;
     private bool runningInEditor = false;
@@ -56,6 +59,7 @@ public class Swiper : MonoBehaviour
         counter = totalSwipes;
         targetIndex = 0;
         timer = 0;
+        pauseTimer = 0f;
         timerStarted = false;
         timerFinished = false;
         menuButton.gameObject.SetActive(false);
@@ -74,6 +78,12 @@ public class Swiper : MonoBehaviour
             return true;
         }
 
+        return Input.touchCount == 1;
+    }
+
+    bool IsActivelyTouching()
+    {
+        if (runningInEditor) return Input.GetMouseButton(0);
         return Input.touchCount == 1;
     }
 
@@ -107,6 +117,21 @@ public class Swiper : MonoBehaviour
             if (!timerStarted)
             {
                 timerStarted = true;
+            }
+        }
+
+        // Pause timeout — end game if player stops touching for too long
+        if (timerStarted && counter > 0)
+        {
+            if (IsActivelyTouching())
+                pauseTimer = 0f;
+            else
+                pauseTimer += Time.deltaTime;
+
+            if (pauseTimer >= pauseTimeout)
+            {
+                EndGame();
+                return;
             }
         }
 

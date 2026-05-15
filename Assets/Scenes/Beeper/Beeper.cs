@@ -23,12 +23,15 @@ public class Beeper : MonoBehaviour
     public enum State { Holding, Ready, Failed }
     public State state;
 
+    public float pauseTimeout = 5f;
+
     private int currentSpot = 0;
     private int swipeCount = 0;
     private float windowDuration;
     private float windowTimer = 0;
     private float delayTimer = 0;
     private float randomDelay = 0;
+    private float pauseTimer = 0f;
     private double timer = 0;
     private bool timerStarted = false;
     private bool runningInEditor = false;
@@ -63,6 +66,7 @@ public class Beeper : MonoBehaviour
         windowDuration = initialWindow;
         windowTimer = 0;
         delayTimer = 0;
+        pauseTimer = 0f;
         timer = 0;
         timerStarted = false;
         state = State.Holding;
@@ -76,11 +80,13 @@ public class Beeper : MonoBehaviour
 
     bool HasTouch()
     {
-        if (runningInEditor)
-        {
-            return true;
-        }
+        if (runningInEditor) return true;
+        return Input.touchCount == 1;
+    }
 
+    bool IsActivelyTouching()
+    {
+        if (runningInEditor) return Input.GetMouseButton(0);
         return Input.touchCount == 1;
     }
 
@@ -102,6 +108,18 @@ public class Beeper : MonoBehaviour
         if (timerStarted)
         {
             timer += Time.deltaTime;
+
+            if (IsActivelyTouching())
+                pauseTimer = 0f;
+            else
+                pauseTimer += Time.deltaTime;
+
+            if (pauseTimer >= pauseTimeout)
+            {
+                state = State.Failed;
+                EndGame();
+                return;
+            }
         }
 
         Vector2 point = TouchPoint();

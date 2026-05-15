@@ -35,9 +35,12 @@ public class Rotator : MonoBehaviour
     private enum State { Gauge, Rotating, Finished }
     private State state;
 
+    public float pauseTimeout = 5f;
+
     private float currentAngle = 270f; // start at bottom (6 o'clock)
     private int currentRotation = 0;
     private float currentSpeed;
+    private float pauseTimer = 0f;
     private bool runningInEditor = false;
 
     // Colours
@@ -67,6 +70,7 @@ public class Rotator : MonoBehaviour
         currentAngle = 270f;
         currentRotation = 0;
         currentSpeed = baseSpeed;
+        pauseTimer = 0f;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
         rotationCountText.text = "";
@@ -96,12 +100,14 @@ public class Rotator : MonoBehaviour
 
     bool TapThisFrame()
     {
-        if (runningInEditor)
-        {
-            return Input.GetMouseButtonDown(0);
-        }
-
+        if (runningInEditor) return Input.GetMouseButtonDown(0);
         return Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
+    }
+
+    bool IsActivelyTouching()
+    {
+        if (runningInEditor) return Input.GetMouseButton(0);
+        return Input.touchCount == 1;
     }
 
     // Returns how close the angle is to 12 o'clock (90 degrees), 0 = outside zone, 1 = perfect
@@ -137,6 +143,17 @@ public class Rotator : MonoBehaviour
         }
         else if (state == State.Rotating)
         {
+            if (IsActivelyTouching())
+                pauseTimer = 0f;
+            else
+                pauseTimer += Time.deltaTime;
+
+            if (pauseTimer >= pauseTimeout)
+            {
+                EndGame(0f);
+                return;
+            }
+
             currentSpeed += acceleration * Time.deltaTime;
             currentAngle -= currentSpeed * Time.deltaTime;
 

@@ -53,8 +53,11 @@ public class Tracer : MonoBehaviour
     private int nextGate = 0;
     private int direction = 0;          // 0 = undecided, 1 = clockwise, -1 = counter
 
+    public float pauseTimeout = 5f;
+
     // Tracer state
     private double tracerTimer = 0;
+    private float pauseTimer = 0f;
     private bool tracingStarted = false;
     private int lapsCompleted = 0;
 
@@ -119,6 +122,7 @@ public class Tracer : MonoBehaviour
     {
         state = State.Tracing;
         tracerTimer = 0;
+        pauseTimer = 0f;
         tracingStarted = false;
         lapsCompleted = 0;
         nextGate = 1;           // start at gate 1 — player begins at left (gate 0)
@@ -216,8 +220,23 @@ public class Tracer : MonoBehaviour
         if (!InputHeld())
         {
             tracingStarted = false;
+
+            // End game if player stops tracing mid-run
+            if (direction != 0)
+            {
+                pauseTimer += Time.deltaTime;
+                if (pauseTimer >= pauseTimeout)
+                {
+                    scoreText.text = "0";
+                    menuButton.gameObject.SetActive(true);
+                    resetButton.gameObject.SetActive(true);
+                    state = State.Finished;
+                }
+            }
             return;
         }
+
+        pauseTimer = 0f;
 
         Vector2 point = InputPosition();
 
