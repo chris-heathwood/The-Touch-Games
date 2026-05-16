@@ -10,6 +10,9 @@ public class Swiper : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Spots - assign in Inspector in the order the player should cycle through them
     public SpriteRenderer[] spots;
 
@@ -51,6 +54,7 @@ public class Swiper : MonoBehaviour
     {
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         timerFinished = true;
     }
 
@@ -64,6 +68,7 @@ public class Swiper : MonoBehaviour
         timerFinished = false;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
 
         for (int i = 0; i < spots.Length; i++)
         {
