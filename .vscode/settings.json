@@ -57,6 +57,8 @@
     },
     "dotnet.defaultSolution": "Messing.sln",
     "cSpell.words": [
+        "lerp",
+        "Mathf",
         "UGUI"
     ]
 }
