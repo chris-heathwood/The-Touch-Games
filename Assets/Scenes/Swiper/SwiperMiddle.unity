@@ -448,6 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuButton: {fileID: 1382850894}
   resetButton: {fileID: 787659041}
+  menuBackground: {fileID: 4493017128729387763}
   spots:
   - {fileID: 2126931733}
   - {fileID: 728734075}
@@ -1223,6 +1224,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+--- !u!212 &4493017128729387763 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6958000675043494047, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+  m_PrefabInstance: {fileID: 4493017128729387762}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

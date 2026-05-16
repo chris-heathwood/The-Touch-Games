@@ -9,6 +9,9 @@ public class Beeper : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Spots - two spots, assigned in Inspector (0 = left, 1 = right)
     public SpriteRenderer[] spots;
 
@@ -57,6 +60,7 @@ public class Beeper : MonoBehaviour
         spots[currentSpot].color = yellow;
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
     }
 
     void ResetGame()
@@ -73,6 +77,7 @@ public class Beeper : MonoBehaviour
         randomDelay = UnityEngine.Random.Range(1f, 3f);
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
 
         spots[0].color = white;
         spots[1].color = yellow;

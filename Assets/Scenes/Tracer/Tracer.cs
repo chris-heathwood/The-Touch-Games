@@ -10,6 +10,9 @@ public class Tracer : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Shooter sprite buttons
     public SpriteRenderer steadySprite;
     public SpriteRenderer shootSprite;
@@ -138,6 +141,7 @@ public class Tracer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         tracerElements.SetActive(true);
         shooterElements.SetActive(false);
 
@@ -153,6 +157,7 @@ public class Tracer : MonoBehaviour
         scoreText.text = Mathf.RoundToInt(finalScore).ToString();
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         state = State.Finished;
     }
 
@@ -258,6 +263,7 @@ public class Tracer : MonoBehaviour
             scoreText.text = "0";
             menuButton.gameObject.SetActive(true);
             resetButton.gameObject.SetActive(true);
+            if (menuBackground != null) menuBackground.gameObject.SetActive(true);
             state = State.Finished;
             return;
         }

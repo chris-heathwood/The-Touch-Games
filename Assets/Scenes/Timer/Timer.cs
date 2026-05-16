@@ -8,6 +8,9 @@ public class Timer : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Elements
     public GameObject timerElements;
     public GameObject gaugeElements;
@@ -65,6 +68,7 @@ public class Timer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         timerElements.SetActive(true);
         gaugeElements.SetActive(false);
         powerGauge.Reset();
@@ -76,6 +80,7 @@ public class Timer : MonoBehaviour
         scoreText.text = Mathf.RoundToInt(score).ToString();
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         state = State.Finished;
     }
 
@@ -119,6 +124,7 @@ public class Timer : MonoBehaviour
                 scoreText.text = "0";
                 menuButton.gameObject.SetActive(true);
                 resetButton.gameObject.SetActive(true);
+                if (menuBackground != null) menuBackground.gameObject.SetActive(true);
                 return;
             }
 
@@ -167,6 +173,7 @@ public class Timer : MonoBehaviour
                 scoreText.text = "0";
                 menuButton.gameObject.SetActive(true);
                 resetButton.gameObject.SetActive(true);
+                if (menuBackground != null) menuBackground.gameObject.SetActive(true);
                 state = State.Finished;
             }
         }

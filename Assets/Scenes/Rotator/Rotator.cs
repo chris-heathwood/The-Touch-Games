@@ -9,6 +9,9 @@ public class Rotator : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Root GameObjects for each phase — assign the empty parent GameObjects in Inspector
     public GameObject gaugeElements;
     public GameObject rotatorElements;
@@ -73,6 +76,7 @@ public class Rotator : MonoBehaviour
         pauseTimer = 0f;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         rotationCountText.text = "";
         scoreText.text = "";
         powerGauge.Reset();
@@ -85,6 +89,7 @@ public class Rotator : MonoBehaviour
         scoreText.text = Mathf.RoundToInt(score).ToString();
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         state = State.Finished;
     }
 

@@ -9,6 +9,9 @@ public class Balancer : MonoBehaviour
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
 
+    // Menu background
+    public SpriteRenderer menuBackground;
+
     // Visual elements — PoleRoot contains pole, pivotBall and topBall as children
     public Transform poleRoot;   // empty GameObject at bottom pivot point, this rotates
 
@@ -65,6 +68,7 @@ public class Balancer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         ApplyAngle();
     }
 
@@ -74,6 +78,7 @@ public class Balancer : MonoBehaviour
         scoreText.text = TimeSpan.FromSeconds(timer).ToString(@"mm\:ss\:fff");
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (menuBackground != null) menuBackground.gameObject.SetActive(true);
     }
 
     void ApplyAngle()
