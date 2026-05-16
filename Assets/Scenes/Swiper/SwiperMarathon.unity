@@ -453,9 +453,10 @@ MonoBehaviour:
   - {fileID: 728734075}
   - {fileID: 1373321660}
   - {fileID: 1349298187}
-  totalSwipes: 100
+  totalSwipes: 10000
   counterText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
+  pauseTimeout: 5
 --- !u!1 &538685122
 GameObject:
   m_ObjectHideFlags: 0
