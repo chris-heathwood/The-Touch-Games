@@ -47,9 +47,28 @@ public class Menu : MonoBehaviour
 
     private bool runningInEditor;
 
+    public static string returnScene = "";
+
     void Start()
     {
         if (Application.isEditor) runningInEditor = true;
+
+        if (!string.IsNullOrEmpty(returnScene))
+        {
+            for (int i = 0; i < sceneNames.Length; i++)
+            {
+                foreach (string s in sceneNames[i].Split(','))
+                {
+                    if (s.Trim() == returnScene)
+                    {
+                        startRow = i;
+                        break;
+                    }
+                }
+            }
+            returnScene = "";
+        }
+
         scrollOffset = startRow;
         targetOffset = startRow;
         if (fadeOverlay != null) fadeOverlay.alpha = 1f;

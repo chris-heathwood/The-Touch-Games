@@ -622,7 +622,7 @@ MonoBehaviour:
   timerText: {fileID: 177836927}
   scoreText: {fileID: 1482626318}
   countdownText: {fileID: 0}
-  maxAngle: 30
+  maxAngle: 90
   initialDriftSpeed: 10
   driftEscalation: 10
   correctionSpeed: 60

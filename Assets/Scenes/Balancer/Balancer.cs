@@ -61,7 +61,7 @@ public class Balancer : MonoBehaviour
         for (int i = 0; i < poleRenderers.Length; i++)
             poleOriginalColors[i] = poleRenderers[i].color;
 
-        menuButton.onClick.AddListener(() => SceneManager.LoadScene("Menu"));
+        menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
         ResetGame();
     }

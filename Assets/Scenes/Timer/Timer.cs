@@ -51,7 +51,7 @@ public class Timer : MonoBehaviour
             runningInEditor = true;
         }
 
-        menuButton.onClick.AddListener(() => SceneManager.LoadScene("Menu"));
+        menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
         ResetGame();
     }
