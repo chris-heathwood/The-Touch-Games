@@ -7,6 +7,7 @@ public class Timer : MonoBehaviour
     // Buttons
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -53,6 +54,7 @@ public class Timer : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Timer));
         ResetGame();
     }
 
@@ -68,6 +70,7 @@ public class Timer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         timerElements.SetActive(true);
         gaugeElements.SetActive(false);
@@ -78,8 +81,10 @@ public class Timer : MonoBehaviour
     {
         float score = totalScore * powerGauge.Power * 1000f;
         scoreText.text = Mathf.RoundToInt(score).ToString();
+        GameCenter.ReportScore((long)score, GameCenter.Timer);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         state = State.Finished;
     }

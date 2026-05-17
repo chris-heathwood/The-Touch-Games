@@ -9,6 +9,7 @@ public class Tracer : MonoBehaviour
     // Menu/Reset buttons (UI)
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -86,6 +87,7 @@ public class Tracer : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Tracer));
 
         gaugeOriginalLocalScale = steadyGaugeFill.transform.localScale;
         gaugeOriginalLocalPos = steadyGaugeFill.transform.localPosition;
@@ -160,6 +162,7 @@ public class Tracer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         tracerElements.SetActive(true);
         shooterElements.SetActive(false);
@@ -174,8 +177,10 @@ public class Tracer : MonoBehaviour
     {
         float finalScore = tracerScore + shooterScore;
         scoreText.text = Mathf.RoundToInt(finalScore).ToString();
+        GameCenter.ReportScore((long)finalScore, GameCenter.Tracer);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         state = State.Finished;
     }

@@ -8,6 +8,7 @@ public class Beeper : MonoBehaviour
     // Buttons
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -52,14 +53,17 @@ public class Beeper : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Beeper));
         ResetGame();
     }
 
     void EndGame()
     {
         spots[currentSpot].color = yellow;
+        GameCenter.ReportScore(swipeCount, GameCenter.Beeper);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
     }
 
@@ -77,6 +81,7 @@ public class Beeper : MonoBehaviour
         randomDelay = UnityEngine.Random.Range(1f, 3f);
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
 
         spots[0].color = white;

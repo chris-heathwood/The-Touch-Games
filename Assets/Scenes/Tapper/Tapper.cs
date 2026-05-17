@@ -8,6 +8,7 @@ public class Tapper : MonoBehaviour
     // Buttons
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -46,6 +47,7 @@ public class Tapper : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Tapper));
         ResetGame();
     }
 
@@ -53,6 +55,7 @@ public class Tapper : MonoBehaviour
     {
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         timerFinished = true;
     }
@@ -67,6 +70,7 @@ public class Tapper : MonoBehaviour
         timerFinished = false;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
 
         for (int i = 0; i < spots.Length; i++)
@@ -150,6 +154,7 @@ public class Tapper : MonoBehaviour
                 // is always a multiple of ~33ms at 30fps. Adding timer/10000 breaks the uniform rounding
                 // with a small deterministic offset derived from the player's actual run time.
                 timer += timer / 10000;
+                GameCenter.ReportScore(Mathf.Max(0, (long)(999999 - timer * 1000)), GameCenter.Tapper);
                 EndGame();
             }
         }

@@ -34,6 +34,7 @@ public class Splash : MonoBehaviour
     {
         currentRadius = orbitRadius;
         SetAlpha(0f);
+        GameCenter.Authenticate();
     }
 
     void Update()

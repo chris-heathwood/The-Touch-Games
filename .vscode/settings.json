@@ -57,8 +57,10 @@
     },
     "dotnet.defaultSolution": "Messing.sln",
     "cSpell.words": [
+        "appstoreconnect",
         "lerp",
         "Mathf",
+        "thetouchgames",
         "UGUI"
     ]
 }

@@ -8,6 +8,7 @@ public class Balancer : MonoBehaviour
     // Buttons
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -63,6 +64,7 @@ public class Balancer : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Balancer));
         ResetGame();
     }
 
@@ -83,6 +85,7 @@ public class Balancer : MonoBehaviour
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
         countingDown = true;
         countdownValue = 3;
@@ -96,8 +99,10 @@ public class Balancer : MonoBehaviour
         gameOver = true;
         foreach (var r in poleRenderers) r.color = Color.red;
         scoreText.text = TimeSpan.FromSeconds(timer).ToString(@"mm\:ss\:fff");
+        GameCenter.ReportScore((long)(timer * 1000), GameCenter.Balancer);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
     }
 

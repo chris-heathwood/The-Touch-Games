@@ -9,6 +9,10 @@ public class Swiper : MonoBehaviour
     // Buttons
     public UnityEngine.UI.Button menuButton;
     public UnityEngine.UI.Button resetButton;
+    public UnityEngine.UI.Button leaderboardButton;
+
+    // Leaderboard ID — set per scene in Inspector
+    public string leaderboardId = GameCenter.SwipeSprint;
 
     // Menu background
     public SpriteRenderer menuBackground;
@@ -48,6 +52,7 @@ public class Swiper : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
+        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(leaderboardId));
         ResetGame();
     }
 
@@ -55,6 +60,7 @@ public class Swiper : MonoBehaviour
     {
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
         timerFinished = true;
     }
@@ -70,6 +76,7 @@ public class Swiper : MonoBehaviour
         timerFinished = false;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
+        if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
 
         for (int i = 0; i < spots.Length; i++)
@@ -145,6 +152,8 @@ public class Swiper : MonoBehaviour
 
                 timer += Timing.CalculateFinalDelta(finalSpot.bounds, previousPoint, point, Time.deltaTime);
 
+                long scoreMs = Mathf.Max(0, (int)(999999 - timer * 1000));
+                GameCenter.ReportScore(scoreMs, leaderboardId);
                 EndGame();
             }
         }
