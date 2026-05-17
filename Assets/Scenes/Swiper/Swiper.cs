@@ -28,6 +28,7 @@ public class Swiper : MonoBehaviour
     private int counter;
     private int targetIndex = 0;
     private Vector2 previousPoint;
+    private bool previousPointValid = false;
     private double timer = 0;
     private float pauseTimer = 0f;
     private bool timerStarted = false;
@@ -64,6 +65,7 @@ public class Swiper : MonoBehaviour
         targetIndex = 0;
         timer = 0;
         pauseTimer = 0f;
+        previousPointValid = false;
         timerStarted = false;
         timerFinished = false;
         menuButton.gameObject.SetActive(false);
@@ -109,10 +111,11 @@ public class Swiper : MonoBehaviour
 
         if (!HasTouch())
         {
+            previousPointValid = false;
             return;
         }
 
-        if (spots[targetIndex].bounds.Contains(point))
+        if (previousPointValid && SwipedThrough(spots[targetIndex].bounds, previousPoint, point))
         {
             spots[targetIndex].color = red;
             targetIndex = (targetIndex + 1) % spots.Length;
@@ -120,9 +123,7 @@ public class Swiper : MonoBehaviour
             counter--;
 
             if (!timerStarted)
-            {
                 timerStarted = true;
-            }
         }
 
         // Pause timeout — end game if player stops touching for too long
@@ -163,5 +164,19 @@ public class Swiper : MonoBehaviour
         counterText.text = counter.ToString();
         timerText.text = timespan.ToString(@"mm\:ss\:fff");
         previousPoint = point;
+        previousPointValid = true;
+    }
+
+    // True if the path from 'from' to 'to' passes through or ends inside the bounds
+    bool SwipedThrough(Bounds bounds, Vector2 from, Vector2 to)
+    {
+        if (bounds.Contains(to)) return true;
+
+        Vector2 dir = to - from;
+        float dist = dir.magnitude;
+        if (dist < 0.001f) return false;
+
+        Ray ray = new Ray(new Vector3(from.x, from.y, 0f), new Vector3(dir.x, dir.y, 0f));
+        return bounds.IntersectRay(ray, out float hitDist) && hitDist <= dist;
     }
 }

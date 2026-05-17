@@ -129,7 +129,7 @@ public class Menu : MonoBehaviour
         float scroll = Input.mouseScrollDelta.y;
         if (Mathf.Abs(scroll) > 0.01f)
         {
-            targetOffset = Mathf.Clamp(targetOffset - scroll * 0.3f, 0f, rows.Length - 1);
+            targetOffset = Mathf.Clamp(targetOffset + scroll * 0.3f, 0f, rows.Length - 1);
             scrollStopTimer = 0f;
             wasScrolling = true;
         }
@@ -158,7 +158,8 @@ public class Menu : MonoBehaviour
         {
             float delta = InputPos().y - dragStartY;
             maxDragDistance = Mathf.Max(maxDragDistance, Mathf.Abs(delta));
-            targetOffset = Mathf.Clamp(scrollAtDragStart - delta / rowHeight, 0f, rows.Length - 1);
+            float scrollDir = runningInEditor ? -1f : 1f;
+            targetOffset = Mathf.Clamp(scrollAtDragStart + scrollDir * delta / rowHeight, 0f, rows.Length - 1);
         }
 
         if (InputEnded())

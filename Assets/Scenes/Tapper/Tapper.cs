@@ -31,6 +31,7 @@ public class Tapper : MonoBehaviour
     private bool timerStarted = false;
     private bool timerFinished = false;
     private bool runningInEditor = false;
+    private int lastTapFingerId = -1;
 
     // Colours, these use floats from 0 -> 1 not standard rgb
     private Color orange = new(0.965f, 0.447f, 0.043f, 1);
