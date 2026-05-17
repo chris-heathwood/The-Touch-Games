@@ -17,7 +17,7 @@ public class Beeper : MonoBehaviour
 
     // Tuning - adjust in Inspector
     public float initialWindow = 2f;
-    public float windowShrinkAmount = 0.05f;
+    public float windowShrinkAmount = 0.17f;
 
     // Text
     public TextMeshProUGUI swipeCountText;

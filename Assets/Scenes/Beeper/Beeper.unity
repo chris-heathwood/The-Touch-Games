@@ -618,7 +618,7 @@ MonoBehaviour:
   - {fileID: 2126931733}
   - {fileID: 728734075}
   initialWindow: 2
-  windowShrinkAmount: 0.05
+  windowShrinkAmount: 0.17
   swipeCountText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
   state: 0

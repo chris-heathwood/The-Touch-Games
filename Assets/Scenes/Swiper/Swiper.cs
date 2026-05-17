@@ -112,6 +112,11 @@ public class Swiper : MonoBehaviour
         if (!HasTouch())
         {
             previousPointValid = false;
+            if (timerStarted && counter > 0)
+            {
+                EndGame();
+                return;
+            }
             return;
         }
 
@@ -124,21 +129,6 @@ public class Swiper : MonoBehaviour
 
             if (!timerStarted)
                 timerStarted = true;
-        }
-
-        // Pause timeout — end game if player stops touching for too long
-        if (timerStarted && counter > 0)
-        {
-            if (IsActivelyTouching())
-                pauseTimer = 0f;
-            else
-                pauseTimer += Time.deltaTime;
-
-            if (pauseTimer >= pauseTimeout)
-            {
-                EndGame();
-                return;
-            }
         }
 
         // Timer

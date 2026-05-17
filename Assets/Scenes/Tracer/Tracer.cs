@@ -225,8 +225,9 @@ public class Tracer : MonoBehaviour
 
     Vector2 InputPosition()
     {
-        Vector2 screenPos = runningInEditor ? Input.mousePosition : Input.GetTouch(0).position;
-        return Camera.main.ScreenToWorldPoint(screenPos);
+        if (runningInEditor) return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (Input.touchCount == 0) return new Vector2(-9999f, -9999f);
+        return Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
     }
 
     bool InputHeld()

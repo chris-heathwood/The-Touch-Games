@@ -49,8 +49,10 @@
             - Drag back
             - Keep circle balanced for as long as possible
         - Tracer
-            - Follow a track
-            - Figure of 8?
+            - Tapper for 100
+            - Aim inside a wobbly box
+            - Hold button to calm wobble
+            - Bit like Biathlon
     - Future features
         - Local play
             - Pass the phone?

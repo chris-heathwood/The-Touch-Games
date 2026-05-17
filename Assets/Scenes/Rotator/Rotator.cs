@@ -30,7 +30,6 @@ public class Rotator : MonoBehaviour
     // Text
     public TextMeshProUGUI rotationCountText;
     public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI countdownText;
 
     // Fixed acceleration curve — same every run
     public float baseSpeed = 120f;
@@ -69,7 +68,6 @@ public class Rotator : MonoBehaviour
     {
         gaugeElements.SetActive(forState == State.Gauge);
         rotatorElements.SetActive(forState == State.Countdown || forState == State.Rotating || forState == State.Finished);
-        if (countdownText != null) countdownText.gameObject.SetActive(forState == State.Countdown);
     }
 
     void ResetGame()
@@ -150,7 +148,7 @@ public class Rotator : MonoBehaviour
                 state = State.Countdown;
                 countdownValue = 3;
                 countdownTimer = 0f;
-                if (countdownText != null) countdownText.text = "3";
+                rotationCountText.text = "3";
                 ShowElements(state);
             }
         }
@@ -168,9 +166,9 @@ public class Rotator : MonoBehaviour
                     rotationCountText.text = currentRotation.ToString();
                     ShowElements(state);
                 }
-                else if (countdownText != null)
+                else
                 {
-                    countdownText.text = countdownValue.ToString();
+                    rotationCountText.text = countdownValue.ToString();
                 }
             }
         }
