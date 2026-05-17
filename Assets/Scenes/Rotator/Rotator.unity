@@ -489,9 +489,11 @@ MonoBehaviour:
   totalRotations: 3
   rotationCountText: {fileID: 1482626318}
   scoreText: {fileID: 1482626318}
-  baseSpeed: 90
-  acceleration: 20
+  countdownText: {fileID: 0}
+  baseSpeed: 120
+  acceleration: 40
   pauseTimeout: 5
+  countdownStepDuration: 0.6
 --- !u!1 &538685122
 GameObject:
   m_ObjectHideFlags: 0

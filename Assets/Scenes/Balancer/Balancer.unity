@@ -618,13 +618,17 @@ MonoBehaviour:
   resetButton: {fileID: 2035032452}
   menuBackground: {fileID: 2035032450}
   poleRoot: {fileID: 974609045}
+  topBall: {fileID: 279731199}
   timerText: {fileID: 177836927}
   scoreText: {fileID: 1482626318}
+  countdownText: {fileID: 0}
   maxAngle: 30
   initialDriftSpeed: 10
   driftEscalation: 10
   correctionSpeed: 60
   dragRange: 3
+  countdownStepDuration: 0.6
+  nudgeAngle: 5
 --- !u!1 &538685122
 GameObject:
   m_ObjectHideFlags: 0

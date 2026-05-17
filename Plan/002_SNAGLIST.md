@@ -31,10 +31,11 @@ Go through these one by one and fix them in the app.
 # Balancer
 
 1. Needs a count down then knock it slightly off balance to start
+2. Needs to crash in to the ground or the sides of the screen to end game
 
 # Tracer
 
 1. Track works well could just be a bit wider
-2. Whit dot needs to start in same place each time
+2. White dot on track needs to start in same place each time on restart
 3. The aim that jitters only does so when you touch the screen
 4. The gauge is not in the middle and does not work properly

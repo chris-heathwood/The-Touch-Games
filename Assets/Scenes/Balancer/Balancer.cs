@@ -14,19 +14,26 @@ public class Balancer : MonoBehaviour
 
     // Visual elements — PoleRoot contains pole, pivotBall and topBall as children
     public Transform poleRoot;   // empty GameObject at bottom pivot point, this rotates
+    public Transform topBall;    // the ball at the top of the pole
 
     // Text
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI countdownText;
 
     // Tuning
-    public float maxAngle = 30f;           // degrees either side before game over
+    public float maxAngle = 90f;           // degrees either side before game over
     public float initialDriftSpeed = 3f;   // degrees/second the pole drifts at start
     public float driftEscalation = 0.5f;   // degrees/second added to drift speed per second
     public float correctionSpeed = 60f;    // degrees/second the pivot drag can correct
     public float dragRange = 3f;           // world units the pivot can be dragged across
+    public float countdownStepDuration = 0.6f;
+    public float nudgeAngle = 5f;          // degrees off-balance applied when countdown ends
 
     private float currentAngle = 0f;
+    private bool countingDown = false;
+    private int countdownValue;
+    private float countdownTimer;
     private float currentDriftSpeed = 0f;
     private float driftDirection = 1f;
     private double timer = 0;
@@ -42,12 +49,17 @@ public class Balancer : MonoBehaviour
     private Color indigo = new(0.569f, 0.043f, 0.965f, 1);
     private Color white = new(1f, 1f, 1f, 1);
 
+    private SpriteRenderer[] poleRenderers;
+    private Color[] poleOriginalColors;
+
     void Start()
     {
-        if (Application.isEditor)
-        {
-            runningInEditor = true;
-        }
+        if (Application.isEditor) runningInEditor = true;
+
+        poleRenderers = poleRoot.GetComponentsInChildren<SpriteRenderer>();
+        poleOriginalColors = new Color[poleRenderers.Length];
+        for (int i = 0; i < poleRenderers.Length; i++)
+            poleOriginalColors[i] = poleRenderers[i].color;
 
         menuButton.onClick.AddListener(() => SceneManager.LoadScene("Menu"));
         resetButton.onClick.AddListener(() => ResetGame());
@@ -59,6 +71,9 @@ public class Balancer : MonoBehaviour
         currentAngle = 0f;
         currentDriftSpeed = initialDriftSpeed;
         driftDirection = UnityEngine.Random.value > 0.5f ? 1f : -1f;
+        if (poleRenderers != null)
+            for (int i = 0; i < poleRenderers.Length; i++)
+                poleRenderers[i].color = poleOriginalColors[i];
         timer = 0;
         gameStarted = false;
         gameOver = false;
@@ -69,12 +84,17 @@ public class Balancer : MonoBehaviour
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
+        countingDown = true;
+        countdownValue = 3;
+        countdownTimer = 0f;
+        if (countdownText != null) { countdownText.gameObject.SetActive(true); countdownText.text = "3"; }
         ApplyAngle();
     }
 
     void EndGame()
     {
         gameOver = true;
+        foreach (var r in poleRenderers) r.color = Color.red;
         scoreText.text = TimeSpan.FromSeconds(timer).ToString(@"mm\:ss\:fff");
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
@@ -112,6 +132,28 @@ public class Balancer : MonoBehaviour
     void Update()
     {
         if (gameOver) return;
+
+        if (countingDown)
+        {
+            countdownTimer += Time.deltaTime;
+            if (countdownTimer >= countdownStepDuration)
+            {
+                countdownTimer -= countdownStepDuration;
+                countdownValue--;
+                if (countdownValue < 0)
+                {
+                    countingDown = false;
+                    if (countdownText != null) countdownText.gameObject.SetActive(false);
+                    currentAngle = nudgeAngle * driftDirection;
+                    gameStarted = true;
+                }
+                else if (countdownText != null)
+                {
+                    countdownText.text = countdownValue.ToString();
+                }
+            }
+            return;
+        }
 
         // Handle drag input
         if (InputBegan())
@@ -155,6 +197,14 @@ currentAngle = Mathf.Clamp(currentAngle, -maxAngle * 2f, maxAngle * 2f);
         if (Mathf.Abs(currentAngle) >= maxAngle)
         {
             EndGame();
+            return;
+        }
+
+        if (topBall != null)
+        {
+            float vx = Camera.main.WorldToViewportPoint(topBall.position).x;
+            if (vx < 0f || vx > 1f)
+                EndGame();
         }
     }
 }

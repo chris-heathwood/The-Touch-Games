@@ -30,17 +30,21 @@ public class Rotator : MonoBehaviour
     // Text
     public TextMeshProUGUI rotationCountText;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI countdownText;
 
     // Fixed acceleration curve — same every run
-    public float baseSpeed = 60f;
-    public float acceleration = 20f; // degrees/second added per second
+    public float baseSpeed = 120f;
+    public float acceleration = 40f; // degrees/second added per second
 
-    private enum State { Gauge, Rotating, Finished }
+    private enum State { Gauge, Countdown, Rotating, Finished }
     private State state;
 
     public float pauseTimeout = 5f;
+    public float countdownStepDuration = 0.6f;
 
-    private float currentAngle = 270f; // start at bottom (6 o'clock)
+    private float currentAngle = 270f;
+    private int countdownValue;
+    private float countdownTimer; // start at bottom (6 o'clock)
     private int currentRotation = 0;
     private float currentSpeed;
     private float pauseTimer = 0f;
@@ -64,7 +68,8 @@ public class Rotator : MonoBehaviour
     void ShowElements(State forState)
     {
         gaugeElements.SetActive(forState == State.Gauge);
-        rotatorElements.SetActive(forState == State.Rotating || forState == State.Finished);
+        rotatorElements.SetActive(forState == State.Countdown || forState == State.Rotating || forState == State.Finished);
+        if (countdownText != null) countdownText.gameObject.SetActive(forState == State.Countdown);
     }
 
     void ResetGame()
@@ -74,6 +79,8 @@ public class Rotator : MonoBehaviour
         currentRotation = 0;
         currentSpeed = baseSpeed;
         pauseTimer = 0f;
+        countdownValue = 3;
+        countdownTimer = 0f;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
@@ -140,10 +147,31 @@ public class Rotator : MonoBehaviour
             if (TapThisFrame())
             {
                 powerGauge.Stop();
-                state = State.Rotating;
-                currentRotation = 1;
-                rotationCountText.text = currentRotation.ToString();
+                state = State.Countdown;
+                countdownValue = 3;
+                countdownTimer = 0f;
+                if (countdownText != null) countdownText.text = "3";
                 ShowElements(state);
+            }
+        }
+        else if (state == State.Countdown)
+        {
+            countdownTimer += Time.deltaTime;
+            if (countdownTimer >= countdownStepDuration)
+            {
+                countdownTimer -= countdownStepDuration;
+                countdownValue--;
+                if (countdownValue < 0)
+                {
+                    state = State.Rotating;
+                    currentRotation = 1;
+                    rotationCountText.text = currentRotation.ToString();
+                    ShowElements(state);
+                }
+                else if (countdownText != null)
+                {
+                    countdownText.text = countdownValue.ToString();
+                }
             }
         }
         else if (state == State.Rotating)

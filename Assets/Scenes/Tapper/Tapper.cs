@@ -78,7 +78,20 @@ public class Tapper : MonoBehaviour
     bool TapBegan()
     {
         if (runningInEditor) return Input.GetMouseButtonDown(0);
-        return Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
+        if (Input.touchCount != 1) return false;
+        Touch t = Input.GetTouch(0);
+        if (t.phase == TouchPhase.Began)
+        {
+            lastTapFingerId = t.fingerId;
+            return true;
+        }
+        // Catch fast taps where Began phase was missed at 30fps
+        if (t.phase == TouchPhase.Ended && t.fingerId != lastTapFingerId)
+        {
+            lastTapFingerId = t.fingerId;
+            return true;
+        }
+        return false;
     }
 
     bool IsActivelyTouching()

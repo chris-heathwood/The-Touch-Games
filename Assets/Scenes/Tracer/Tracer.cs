@@ -24,7 +24,7 @@ public class Tracer : MonoBehaviour
     // Tracer
     public LineRenderer trackLine;
     public Transform fingerMarker;
-    public float pathThreshold = 0.5f;
+    public float pathThreshold = 1.0f;
     public float gateRadius = 0.8f;     // how close to a gate to trigger it
     public int lapsRequired = 5;
 
@@ -33,6 +33,7 @@ public class Tracer : MonoBehaviour
     public Transform whiteCircle;
     public SpriteRenderer steadyGaugeFill;
     public float orbitRadius = 1f;
+    public float targetScaleMultiplier = 0.5f;
     public float orbitSpeed = 90f;
     public float jitterSpeed = 45f;
     public float steadyDrain = 0.3f;
@@ -75,12 +76,23 @@ public class Tracer : MonoBehaviour
 
     private bool runningInEditor = false;
 
+    private Vector3[] violetOriginalScales;
+    private Vector3 gaugeOriginalLocalScale;
+    private Vector3 gaugeOriginalLocalPos;
+
     void Start()
     {
         if (Application.isEditor) runningInEditor = true;
 
         menuButton.onClick.AddListener(() => SceneManager.LoadScene("Menu"));
         resetButton.onClick.AddListener(() => ResetGame());
+
+        gaugeOriginalLocalScale = steadyGaugeFill.transform.localScale;
+        gaugeOriginalLocalPos = steadyGaugeFill.transform.localPosition;
+
+        violetOriginalScales = new Vector3[violetCircles.Length];
+        for (int i = 0; i < violetCircles.Length; i++)
+            violetOriginalScales[i] = violetCircles[i].localScale;
 
         GenerateFigureOfEightPath();
         ResetGame();
@@ -102,6 +114,8 @@ public class Tracer : MonoBehaviour
         }
 
         trackLine.positionCount = pathPoints.Count;
+        trackLine.startWidth = pathThreshold * 2f;
+        trackLine.endWidth = pathThreshold * 2f;
         trackLine.loop = false;
         for (int i = 0; i < pathPoints.Count; i++)
         {
@@ -135,6 +149,11 @@ public class Tracer : MonoBehaviour
         aimVelocity = Vector2.zero;
         steadyGauge = 1f;
         isSteadying = false;
+        if (steadyGaugeFill != null)
+        {
+            steadyGaugeFill.transform.localScale = gaugeOriginalLocalScale;
+            steadyGaugeFill.transform.localPosition = gaugeOriginalLocalPos;
+        }
         shooterScore = 0f;
         tracerScore = 0f;
         lapCountText.text = "0";
@@ -197,7 +216,9 @@ public class Tracer : MonoBehaviour
         else
         {
             violetCircles[currentTarget].gameObject.SetActive(true);
-            aimPosition = violetCircles[currentTarget].position;
+            violetCircles[currentTarget].localScale = violetOriginalScales[currentTarget] * targetScaleMultiplier;
+            float nextRadius = violetOriginalScales[currentTarget].x * targetScaleMultiplier * 0.5f;
+            aimPosition = (Vector2)violetCircles[currentTarget].position + UnityEngine.Random.insideUnitCircle.normalized * (nextRadius + orbitRadius);
             aimVelocity = Vector2.zero;
         }
     }
@@ -315,7 +336,9 @@ public class Tracer : MonoBehaviour
                     tracerElements.SetActive(false);
                     shooterElements.SetActive(true);
                     violetCircles[0].gameObject.SetActive(true);
-                    aimPosition = violetCircles[0].position;
+                    violetCircles[0].localScale = violetOriginalScales[0] * targetScaleMultiplier;
+                    float firstTargetRadius = violetOriginalScales[0].x * targetScaleMultiplier * 0.5f;
+                    aimPosition = (Vector2)violetCircles[0].position + UnityEngine.Random.insideUnitCircle.normalized * (firstTargetRadius + orbitRadius);
                     aimVelocity = Vector2.zero;
                     state = State.Shooting;
                 }
@@ -346,9 +369,17 @@ public class Tracer : MonoBehaviour
             steadyGauge = Mathf.Max(0f, steadyGauge - steadyDrain * Time.deltaTime);
         }
 
-        Vector3 gaugeScale = steadyGaugeFill.transform.localScale;
-        gaugeScale.y = steadyGauge;
+        Vector3 gaugeScale = gaugeOriginalLocalScale;
+        gaugeScale.y = gaugeOriginalLocalScale.y * steadyGauge;
         steadyGaugeFill.transform.localScale = gaugeScale;
+
+        // Offset position to keep one end anchored as gauge drains
+        float shrink = gaugeOriginalLocalScale.y * (1f - steadyGauge);
+        steadyGaugeFill.transform.localPosition = new Vector3(
+            gaugeOriginalLocalPos.x,
+            gaugeOriginalLocalPos.y - shrink * 0.5f,
+            gaugeOriginalLocalPos.z
+        );
 
         // Aim wanders randomly across the target; steady slows it down
         bool steadyActive = isSteadying && steadyGauge > 0f;
