@@ -616,6 +616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuButton: {fileID: 2035032451}
   resetButton: {fileID: 2035032452}
+  leaderboardButton: {fileID: 2035032453}
   menuBackground: {fileID: 2035032450}
   poleRoot: {fileID: 974609045}
   topBall: {fileID: 279731199}
@@ -1165,6 +1166,18 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.5686275
       objectReference: {fileID: 0}
+    - target: {fileID: 3172897074451433391, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 3172897074451433391, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+      propertyPath: m_Color.g
+      value: 0.043137256
+      objectReference: {fileID: 0}
+    - target: {fileID: 3172897074451433391, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5686275
+      objectReference: {fileID: 0}
     - target: {fileID: 3260862044033962344, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
       propertyPath: m_Color.b
       value: 0.9647059
@@ -1210,6 +1223,17 @@ MonoBehaviour:
 --- !u!114 &2035032452 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5235249318583721542, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+  m_PrefabInstance: {fileID: 2035032448}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2035032453 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2800815418163001161, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
   m_PrefabInstance: {fileID: 2035032448}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

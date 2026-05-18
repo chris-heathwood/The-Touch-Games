@@ -38,4 +38,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tracer/Tracer.unity
     guid: a496444b25c264885b661ed4c614cb7d
+  - enabled: 1
+    path: Assets/Scenes/MadeWithClaude/MadeWithClaude.unity
+    guid: 568e22bf992244a66b74f370b5e985fc
+  - enabled: 1
+    path: Assets/Scenes/ProducedByMrH/ProducedByMrH.unity
+    guid: 2909953c36ba8434585c33dd27b4f45b
   m_configObjects: {}

@@ -154,7 +154,7 @@ public class Tapper : MonoBehaviour
                 // is always a multiple of ~33ms at 30fps. Adding timer/10000 breaks the uniform rounding
                 // with a small deterministic offset derived from the player's actual run time.
                 timer += timer / 10000;
-                GameCenter.ReportScore(Mathf.Max(0, (long)(999999 - timer * 1000)), GameCenter.Tapper);
+                GameCenter.ReportScore(Math.Max(0L, (long)(999999 - timer * 1000)), GameCenter.Tapper);
                 EndGame();
             }
         }

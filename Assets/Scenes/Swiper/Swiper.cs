@@ -152,7 +152,7 @@ public class Swiper : MonoBehaviour
 
                 timer += Timing.CalculateFinalDelta(finalSpot.bounds, previousPoint, point, Time.deltaTime);
 
-                long scoreMs = Mathf.Max(0, (int)(999999 - timer * 1000));
+                long scoreMs = Math.Max(0L, (long)(999999 - timer * 1000));
                 GameCenter.ReportScore(scoreMs, leaderboardId);
                 EndGame();
             }

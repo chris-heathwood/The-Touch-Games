@@ -448,6 +448,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuButton: {fileID: 2066903266}
   resetButton: {fileID: 2066903267}
+  leaderboardButton: {fileID: 2066903268}
+  leaderboardId: com.thetouchgames.swiper.sprint
   menuBackground: {fileID: 2066903265}
   spots:
   - {fileID: 2126931733}
@@ -979,6 +981,17 @@ MonoBehaviour:
 --- !u!114 &2066903267 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5235249318583721542, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+  m_PrefabInstance: {fileID: 2066903263}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2066903268 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2800815418163001161, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
   m_PrefabInstance: {fileID: 2066903263}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
