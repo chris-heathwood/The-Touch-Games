@@ -14,23 +14,9 @@ public class CreditCard : MonoBehaviour
     private enum Phase { FadeIn, Hold, FadeOut }
     private Phase phase = Phase.FadeIn;
 
-    private SpriteRenderer[] spriteRenderers;
-
     void Start()
     {
-        spriteRenderers = FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None);
-        SetAlpha(0f);
-    }
-
-    void SetAlpha(float alpha)
-    {
-        if (canvasGroup != null) canvasGroup.alpha = alpha;
-        foreach (var sr in spriteRenderers)
-        {
-            Color c = sr.color;
-            c.a = alpha;
-            sr.color = c;
-        }
+        if (canvasGroup != null) canvasGroup.alpha = 0f;
     }
 
     void Update()
@@ -40,7 +26,7 @@ public class CreditCard : MonoBehaviour
         switch (phase)
         {
             case Phase.FadeIn:
-                SetAlpha(Mathf.Clamp01(timer / fadeInDuration));
+                if (canvasGroup != null) canvasGroup.alpha = Mathf.Clamp01(timer / fadeInDuration);
                 if (timer >= fadeInDuration) NextPhase();
                 break;
 
@@ -49,7 +35,7 @@ public class CreditCard : MonoBehaviour
                 break;
 
             case Phase.FadeOut:
-                SetAlpha(Mathf.Clamp01(1f - timer / fadeOutDuration));
+                if (canvasGroup != null) canvasGroup.alpha = Mathf.Clamp01(1f - timer / fadeOutDuration);
                 if (timer >= fadeOutDuration)
                     SceneManager.LoadScene(nextScene);
                 break;
