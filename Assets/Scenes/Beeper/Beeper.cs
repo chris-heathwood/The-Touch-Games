@@ -53,7 +53,7 @@ public class Beeper : MonoBehaviour
 
         menuButton.onClick.AddListener(() => { Menu.returnScene = SceneManager.GetActiveScene().name; SceneManager.LoadScene("Menu"); });
         resetButton.onClick.AddListener(() => ResetGame());
-        if (leaderboardButton != null) leaderboardButton.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Beeper));
+        leaderboardButton?.onClick.AddListener(() => GameCenter.ShowLeaderboard(GameCenter.Beeper));
         ResetGame();
     }
 
@@ -132,8 +132,8 @@ public class Beeper : MonoBehaviour
             }
         }
 
-        Vector2 point = TouchPoint();
         bool touching = HasTouch();
+        Vector2 point = touching ? TouchPoint() : Vector2.zero;
 
         if (state == State.Holding)
         {

@@ -81,6 +81,12 @@ public class Tracer : MonoBehaviour
     private Vector3 gaugeOriginalLocalScale;
     private Vector3 gaugeOriginalLocalPos;
 
+    void Awake()
+    {
+        if (fingerMarker != null)
+            fingerMarker.position = new Vector3(-scaleX, 0f, 0f);
+    }
+
     void Start()
     {
         if (Application.isEditor) runningInEditor = true;
@@ -259,10 +265,9 @@ public class Tracer : MonoBehaviour
                 pauseTimer += Time.deltaTime;
                 if (pauseTimer >= pauseTimeout)
                 {
-                    scoreText.text = "0";
-                    menuButton.gameObject.SetActive(true);
-                    resetButton.gameObject.SetActive(true);
-                    state = State.Finished;
+                    tracerScore = 0f;
+                    shooterScore = 0f;
+                    EndGame();
                 }
             }
             return;
@@ -287,11 +292,9 @@ public class Tracer : MonoBehaviour
 
         if (DistanceToPath(point) > pathThreshold)
         {
-            scoreText.text = "0";
-            menuButton.gameObject.SetActive(true);
-            resetButton.gameObject.SetActive(true);
-            if (menuBackground != null) menuBackground.gameObject.SetActive(true);
-            state = State.Finished;
+            tracerScore = 0f;
+            shooterScore = 0f;
+            EndGame();
             return;
         }
 

@@ -41,14 +41,6 @@ public static class GameCenter
 
     public static void ShowLeaderboard(string leaderboardId)
     {
-        if (!authenticated) return;
-
-        ILeaderboard board = Social.CreateLeaderboard();
-        board.id = leaderboardId;
-        board.LoadScores(success =>
-        {
-            if (success)
-                Social.ShowLeaderboardUI();
-        });
+        Social.ShowLeaderboardUI();
     }
 }

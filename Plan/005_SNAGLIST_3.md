@@ -16,12 +16,12 @@
 
 # Rotator
 
-1. Drop the countup, just have it start and count down
+1. Drop the count up, just have it start and count down
     - Game loads
     - Ball starts moving
-    - Countdown goes 3 2 1 0, use has to hit gap on 0
+    - Countdown goes 3 2 1 0, user has to hit gap on 0
 
 # Tracer
 
-1. Is no showing the leader board button at all
+1. Is not showing the leader board button at all
 2. Ball should always start at the left, I think it needs resetting at the start of the scene

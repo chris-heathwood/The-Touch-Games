@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -25,9 +24,6 @@ public class Rotator : MonoBehaviour
     public Transform trackCenter;
     public float trackRadius = 3f;
 
-    // Configure in Inspector
-    public int totalRotations = 3;
-
     // Text
     public TextMeshProUGUI rotationCountText;
     public TextMeshProUGUI scoreText;
@@ -36,22 +32,17 @@ public class Rotator : MonoBehaviour
     public float baseSpeed = 120f;
     public float acceleration = 40f; // degrees/second added per second
 
-    private enum State { Gauge, Countdown, Rotating, Finished }
+    private enum State { Countdown, HitWindow, Finished }
     private State state;
 
-    public float pauseTimeout = 5f;
     public float countdownStepDuration = 0.6f;
 
     private float currentAngle = 270f;
     private int countdownValue;
-    private float countdownTimer; // start at bottom (6 o'clock)
-    private int currentRotation = 0;
+    private float countdownTimer;
     private float currentSpeed;
-    private float pauseTimer = 0f;
     private bool runningInEditor = false;
 
-    // Colours
-    private Color green = new(0.169f, 0.965f, 0.047f, 1);
 
     void Start()
     {
@@ -66,41 +57,33 @@ public class Rotator : MonoBehaviour
         ResetGame();
     }
 
-    void ShowElements(State forState)
-    {
-        gaugeElements.SetActive(forState == State.Gauge);
-        rotatorElements.SetActive(forState == State.Countdown || forState == State.Rotating || forState == State.Finished);
-    }
-
     void ResetGame()
     {
-        state = State.Gauge;
+        state = State.Countdown;
         currentAngle = 270f;
-        currentRotation = 0;
         currentSpeed = baseSpeed;
-        pauseTimer = 0f;
         countdownValue = 3;
         countdownTimer = 0f;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
-        rotationCountText.text = "";
+        rotationCountText.text = "3";
         scoreText.text = "";
-        powerGauge.Reset();
+        if (gaugeElements != null) gaugeElements.SetActive(false);
+        if (rotatorElements != null) rotatorElements.SetActive(true);
         UpdateBallPosition();
-        ShowElements(state);
     }
 
     void EndGame(float score)
     {
+        state = State.Finished;
         scoreText.text = Mathf.RoundToInt(score).ToString();
         GameCenter.ReportScore((long)score, GameCenter.Rotator);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
-        state = State.Finished;
     }
 
     void UpdateBallPosition()
@@ -117,12 +100,6 @@ public class Rotator : MonoBehaviour
     {
         if (runningInEditor) return Input.GetMouseButtonDown(0);
         return Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
-    }
-
-    bool IsActivelyTouching()
-    {
-        if (runningInEditor) return Input.GetMouseButton(0);
-        return Input.touchCount == 1;
     }
 
     // Returns how close the angle is to 12 o'clock (90 degrees), 0 = outside zone, 1 = perfect
@@ -145,102 +122,56 @@ public class Rotator : MonoBehaviour
 
     void Update()
     {
-        if (state == State.Gauge)
+        if (state == State.Finished) return;
+
+        // Ball always moves
+        currentSpeed += acceleration * Time.deltaTime;
+        currentAngle -= currentSpeed * Time.deltaTime;
+        UpdateBallPosition();
+
+        if (state == State.Countdown)
         {
+            // Tap before 0 = fail
             if (TapThisFrame())
             {
-                powerGauge.Stop();
-                state = State.Countdown;
-                countdownValue = 3;
-                countdownTimer = 0f;
-                rotationCountText.text = "3";
-                ShowElements(state);
+                EndGame(0f);
+                return;
             }
-        }
-        else if (state == State.Countdown)
-        {
+
             countdownTimer += Time.deltaTime;
             if (countdownTimer >= countdownStepDuration)
             {
                 countdownTimer -= countdownStepDuration;
                 countdownValue--;
-                if (countdownValue < 0)
+                rotationCountText.text = countdownValue >= 0 ? countdownValue.ToString() : "";
+                if (countdownValue == 0)
                 {
-                    state = State.Rotating;
-                    currentRotation = 1;
-                    rotationCountText.text = currentRotation.ToString();
-                    ShowElements(state);
+                    state = State.HitWindow;
+                    countdownTimer = 0f;
                 }
-                else
+                else if (countdownValue < 0)
                 {
-                    rotationCountText.text = countdownValue.ToString();
+                    // Stepped past 0 with no state change — shouldn't happen but guard
+                    EndGame(0f);
                 }
             }
         }
-        else if (state == State.Rotating)
+        else if (state == State.HitWindow)
         {
-            if (IsActivelyTouching())
-                pauseTimer = 0f;
-            else
-                pauseTimer += Time.deltaTime;
+            countdownTimer += Time.deltaTime;
 
-            if (pauseTimer >= pauseTimeout)
-            {
-                EndGame(0f);
-                return;
-            }
-
-            currentSpeed += acceleration * Time.deltaTime;
-            currentAngle -= currentSpeed * Time.deltaTime;
-
-            // Check if we completed a rotation
-            float rotationsDone = (270f - currentAngle) / 360f;
-            if (rotationsDone >= currentRotation)
-            {
-                if (currentRotation < totalRotations)
-                {
-                    currentRotation++;
-                    rotationCountText.text = currentRotation.ToString();
-                }
-            }
-
-            UpdateBallPosition();
-
-            // Any tap before the final rotation ends the game
-            if (currentRotation < totalRotations && TapThisFrame())
-            {
-                EndGame(0f);
-                return;
-            }
-
-            // On final rotation, end game if ball passes through zone without a tap
-            if (currentRotation == totalRotations)
-            {
-                float prevNormalised = (((-currentAngle + currentSpeed * Time.deltaTime) % 360f) + 360f) % 360f;
-                float currNormalised = (((-currentAngle) % 360f) + 360f) % 360f;
-                bool passedZone = prevNormalised < 90f && currNormalised >= 90f;
-                if (passedZone && !TapThisFrame())
-                {
-                    EndGame(0f);
-                    return;
-                }
-            }
-
-            // Only accept tap on the final rotation
-            if (currentRotation == totalRotations && TapThisFrame())
+            if (TapThisFrame())
             {
                 float normalised = ((currentAngle % 360f) + 360f) % 360f;
                 float accuracy = AccuracyScore(normalised);
+                EndGame(accuracy * 1000f);
+                return;
+            }
 
-                if (accuracy <= 0f)
-                {
-                    EndGame(0f);
-                }
-                else
-                {
-                    float score = powerGauge.Power * accuracy * 1000f;
-                    EndGame(score);
-                }
+            // Window expired with no tap
+            if (countdownTimer >= countdownStepDuration)
+            {
+                EndGame(0f);
             }
         }
     }

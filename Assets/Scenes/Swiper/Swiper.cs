@@ -114,8 +114,6 @@ public class Swiper : MonoBehaviour
             return;
         }
 
-        Vector2 point = TouchPoint();
-
         if (!HasTouch())
         {
             previousPointValid = false;
@@ -127,15 +125,29 @@ public class Swiper : MonoBehaviour
             return;
         }
 
+        Vector2 point = TouchPoint();
+
         if (previousPointValid && SwipedThrough(spots[targetIndex].bounds, previousPoint, point))
         {
             spots[targetIndex].color = red;
             targetIndex = (targetIndex + 1) % spots.Length;
             spots[targetIndex].color = white;
             counter--;
+            pauseTimer = 0f;
 
             if (!timerStarted)
                 timerStarted = true;
+        }
+
+        // Per-swipe timeout
+        if (timerStarted && counter > 0)
+        {
+            pauseTimer += Time.deltaTime;
+            if (pauseTimer >= pauseTimeout)
+            {
+                EndGame();
+                return;
+            }
         }
 
         // Timer
