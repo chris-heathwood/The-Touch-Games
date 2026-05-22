@@ -44,6 +44,13 @@ public class XcodePostBuild
         proj.ReadFromFile(projPath);
         proj.SetBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", "Unity-iPhone/Unity-iPhone.entitlements");
         proj.WriteToFile(projPath);
+
+        // Declare no custom encryption so TestFlight skips the compliance prompt
+        string infoPlistPath = Path.Combine(buildPath, "Info.plist");
+        PlistDocument infoPlist = new PlistDocument();
+        infoPlist.ReadFromFile(infoPlistPath);
+        infoPlist.root.SetBoolean("ITSAppUsesNonExemptEncryption", false);
+        infoPlist.WriteToFile(infoPlistPath);
     }
 
     static string ReadTeamId()

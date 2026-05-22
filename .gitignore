@@ -77,3 +77,11 @@ crashlytics-build.properties
 .DS_Store
 *_DoNotShip
 .env
+
+# Fastlane
+.asc_key.p8
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+Gemfile.lock

@@ -128,3 +128,12 @@
             - Sprint
             - Middle
             - Marathon
+
+Then to ship a new build:
+
+Build in Unity → File → Build Settings → Build
+
+Run:
+
+bundle exec fastlane beta
+
