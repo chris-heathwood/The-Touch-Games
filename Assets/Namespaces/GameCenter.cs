@@ -13,15 +13,12 @@ public static class GameCenter
     public const string Balancer      = "com.thetouchgames.balancer";
     public const string Tracer        = "com.thetouchgames.tracer";
 
-    private static bool authenticated = false;
-
     public static void Authenticate()
     {
-        if (authenticated) return;
+        if (Social.localUser.authenticated) return;
 
         Social.localUser.Authenticate(success =>
         {
-            authenticated = success;
             if (!success)
                 Debug.Log("GameCenter: authentication failed or unavailable.");
         });
@@ -31,7 +28,7 @@ public static class GameCenter
     // inverted value: ReportScore(999999 - timeInMs, leaderboardId)
     public static void ReportScore(long score, string leaderboardId)
     {
-        if (!authenticated) return;
+        if (!Social.localUser.authenticated) return;
         Social.ReportScore(score, leaderboardId, success =>
         {
             if (!success)

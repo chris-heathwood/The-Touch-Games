@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -181,14 +182,22 @@ public class Tracer : MonoBehaviour
 
     void EndGame()
     {
+        state = State.Finished;
+        tracerElements.SetActive(false);
+        shooterElements.SetActive(false);
         float finalScore = tracerScore + shooterScore;
         scoreText.text = Mathf.RoundToInt(finalScore).ToString();
         GameCenter.ReportScore((long)finalScore, GameCenter.Tracer);
+        StartCoroutine(ShowButtonsDelayed());
+    }
+
+    IEnumerator ShowButtonsDelayed()
+    {
+        yield return new WaitForSeconds(2f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
-        state = State.Finished;
     }
 
     float DistanceToPath(Vector2 point)
@@ -257,23 +266,16 @@ public class Tracer : MonoBehaviour
     {
         if (!InputHeld())
         {
-            tracingStarted = false;
-
-            // End game if player stops tracing mid-run
             if (direction != 0)
             {
-                pauseTimer += Time.deltaTime;
-                if (pauseTimer >= pauseTimeout)
-                {
-                    tracerScore = 0f;
-                    shooterScore = 0f;
-                    EndGame();
-                }
+                tracerScore = 0f;
+                shooterScore = 0f;
+                EndGame();
+                return;
             }
+            tracingStarted = false;
             return;
         }
-
-        pauseTimer = 0f;
 
         Vector2 point = InputPosition();
 

@@ -379,7 +379,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -506,12 +506,10 @@ MonoBehaviour:
   ball: {fileID: 841546945}
   trackCenter: {fileID: 677965800}
   trackRadius: 3
-  totalRotations: 3
   rotationCountText: {fileID: 1482626318}
   scoreText: {fileID: 1482626318}
   baseSpeed: 120
   acceleration: 40
-  pauseTimeout: 5
   countdownStepDuration: 0.6
 --- !u!1 &538685122
 GameObject:
@@ -756,7 +754,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

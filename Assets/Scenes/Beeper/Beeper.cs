@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -61,6 +62,13 @@ public class Beeper : MonoBehaviour
     {
         spots[currentSpot].color = yellow;
         GameCenter.ReportScore(swipeCount, GameCenter.Beeper);
+        state = State.Failed;
+        StartCoroutine(ShowButtonsDelayed());
+    }
+
+    IEnumerator ShowButtonsDelayed()
+    {
+        yield return new WaitForSeconds(2f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);

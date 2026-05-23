@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -53,11 +54,17 @@ public class Tapper : MonoBehaviour
 
     void EndGame()
     {
+        timerFinished = true;
+        StartCoroutine(ShowButtonsDelayed());
+    }
+
+    IEnumerator ShowButtonsDelayed()
+    {
+        yield return new WaitForSeconds(2f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
         if (menuBackground != null) menuBackground.gameObject.SetActive(true);
-        timerFinished = true;
     }
 
     void ResetGame()

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -28,18 +29,18 @@ public class Rotator : MonoBehaviour
     public TextMeshProUGUI rotationCountText;
     public TextMeshProUGUI scoreText;
 
+    // Configure in Inspector
+    public int totalRotations = 3;
+
     // Fixed acceleration curve — same every run
     public float baseSpeed = 120f;
-    public float acceleration = 40f; // degrees/second added per second
+    public float acceleration = 40f;
 
     private enum State { Countdown, HitWindow, Finished }
     private State state;
 
-    public float countdownStepDuration = 0.6f;
-
     private float currentAngle = 270f;
     private int countdownValue;
-    private float countdownTimer;
     private float currentSpeed;
     private bool runningInEditor = false;
 
@@ -62,14 +63,13 @@ public class Rotator : MonoBehaviour
         state = State.Countdown;
         currentAngle = 270f;
         currentSpeed = baseSpeed;
-        countdownValue = 3;
-        countdownTimer = 0f;
+        countdownValue = totalRotations;
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
-        rotationCountText.text = "3";
         scoreText.text = "";
+        rotationCountText.text = totalRotations.ToString();
         if (gaugeElements != null) gaugeElements.SetActive(false);
         if (rotatorElements != null) rotatorElements.SetActive(true);
         UpdateBallPosition();
@@ -80,6 +80,12 @@ public class Rotator : MonoBehaviour
         state = State.Finished;
         scoreText.text = Mathf.RoundToInt(score).ToString();
         GameCenter.ReportScore((long)score, GameCenter.Rotator);
+        StartCoroutine(ShowButtonsDelayed());
+    }
+
+    IEnumerator ShowButtonsDelayed()
+    {
+        yield return new WaitForSeconds(2f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -124,7 +130,7 @@ public class Rotator : MonoBehaviour
     {
         if (state == State.Finished) return;
 
-        // Ball always moves
+        float angleBefore = currentAngle;
         currentSpeed += acceleration * Time.deltaTime;
         currentAngle -= currentSpeed * Time.deltaTime;
         UpdateBallPosition();
@@ -138,41 +144,33 @@ public class Rotator : MonoBehaviour
                 return;
             }
 
-            countdownTimer += Time.deltaTime;
-            if (countdownTimer >= countdownStepDuration)
+            // Decrement countdown once per completed rotation (ball starts at 270°)
+            int rotationsDone = Mathf.FloorToInt((270f - currentAngle) / 360f);
+            int newCountdown = totalRotations - rotationsDone;
+            if (newCountdown != countdownValue)
             {
-                countdownTimer -= countdownStepDuration;
-                countdownValue--;
-                rotationCountText.text = countdownValue >= 0 ? countdownValue.ToString() : "";
-                if (countdownValue == 0)
-                {
+                countdownValue = newCountdown;
+                rotationCountText.text = Mathf.Max(0, countdownValue).ToString();
+                if (countdownValue <= 0)
                     state = State.HitWindow;
-                    countdownTimer = 0f;
-                }
-                else if (countdownValue < 0)
-                {
-                    // Stepped past 0 with no state change — shouldn't happen but guard
-                    EndGame(0f);
-                }
             }
         }
         else if (state == State.HitWindow)
         {
-            countdownTimer += Time.deltaTime;
+            // Ball passed through gap without a tap = fail
+            float prevNorm = (((-angleBefore) % 360f) + 360f) % 360f;
+            float currNorm = (((-currentAngle) % 360f) + 360f) % 360f;
+            bool passedGap = prevNorm < 90f && currNorm >= 90f;
 
             if (TapThisFrame())
             {
                 float normalised = ((currentAngle % 360f) + 360f) % 360f;
-                float accuracy = AccuracyScore(normalised);
-                EndGame(accuracy * 1000f);
+                EndGame(AccuracyScore(normalised) * 1000f);
                 return;
             }
 
-            // Window expired with no tap
-            if (countdownTimer >= countdownStepDuration)
-            {
+            if (passedGap)
                 EndGame(0f);
-            }
         }
     }
 }

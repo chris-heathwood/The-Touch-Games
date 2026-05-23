@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -30,6 +31,8 @@ public class Balancer : MonoBehaviour
     public float dragRange = 3f;           // world units the pivot can be dragged across
     public float countdownStepDuration = 0.6f;
     public float nudgeAngle = 5f;          // degrees off-balance applied when countdown ends
+    public float crashThreshold = 45f;    // past this angle, input is ignored and crash accelerates
+    public float crashSpeedMultiplier = 3f;
 
     private float currentAngle = 0f;
     private bool countingDown = false;
@@ -40,6 +43,7 @@ public class Balancer : MonoBehaviour
     private double timer = 0;
     private bool gameStarted = false;
     private bool gameOver = false;
+    private bool crashing = false;
     private float pivotX = 0f;
     private float dragStartX = 0f;
     private float pivotStartX = 0f;
@@ -79,6 +83,7 @@ public class Balancer : MonoBehaviour
         timer = 0;
         gameStarted = false;
         gameOver = false;
+        crashing = false;
         pivotX = 0f;
         dragging = false;
         timerText.text = "00:00:000";
@@ -100,6 +105,12 @@ public class Balancer : MonoBehaviour
         foreach (var r in poleRenderers) r.color = Color.red;
         scoreText.text = TimeSpan.FromSeconds(timer).ToString(@"mm\:ss\:fff");
         GameCenter.ReportScore((long)(timer * 1000), GameCenter.Balancer);
+        StartCoroutine(ShowButtonsDelayed());
+    }
+
+    IEnumerator ShowButtonsDelayed()
+    {
+        yield return new WaitForSeconds(2f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -160,36 +171,52 @@ public class Balancer : MonoBehaviour
             return;
         }
 
-        // Handle drag input
-        if (InputBegan())
+        // Past threshold — lock input, clear pivot, accelerate in the direction of lean
+        if (!crashing && Mathf.Abs(currentAngle) >= crashThreshold)
         {
-            dragging = true;
-            dragStartX = InputPosition().x;
-            pivotStartX = pivotX;
-            gameStarted = true;
+            crashing = true;
+            dragging = false;
+            pivotX = 0f;
+            driftDirection = Mathf.Sign(currentAngle);
         }
 
-        if (dragging && InputHeld())
+        // Handle drag input only while not crashing
+        if (!crashing)
         {
-            float dragDelta = InputPosition().x - dragStartX;
-            pivotX = Mathf.Clamp(pivotStartX + dragDelta, -dragRange, dragRange);
-        }
-        else
-        {
-            dragging = false;
+            if (InputBegan())
+            {
+                dragging = true;
+                dragStartX = InputPosition().x;
+                pivotStartX = pivotX;
+                gameStarted = true;
+            }
+
+            if (dragging && InputHeld())
+            {
+                float dragDelta = InputPosition().x - dragStartX;
+                pivotX = Mathf.Clamp(pivotStartX + dragDelta, -dragRange, dragRange);
+            }
+            else
+            {
+                dragging = false;
+            }
         }
 
         if (!gameStarted) return;
 
         timer += Time.deltaTime;
 
-        // Continuous drift in one direction, escalating over time
+        // Continuous drift — multiply speed when crashing
+        float speedMultiplier = crashing ? crashSpeedMultiplier : 1f;
         currentDriftSpeed += driftEscalation * Time.deltaTime;
-        currentAngle += driftDirection * currentDriftSpeed * Time.deltaTime;
+        currentAngle += driftDirection * currentDriftSpeed * speedMultiplier * Time.deltaTime;
 
-        // Pivot correction — offset from centre pulls angle back toward vertical
-        float correction = -pivotX * (correctionSpeed * Time.deltaTime);
-        currentAngle += correction;
+        // Pivot correction — only while not crashing
+        if (!crashing)
+        {
+            float correction = -pivotX * (correctionSpeed * Time.deltaTime);
+            currentAngle += correction;
+        }
 
 currentAngle = Mathf.Clamp(currentAngle, -maxAngle * 2f, maxAngle * 2f);
 
