@@ -23,6 +23,7 @@ public class Tapper : MonoBehaviour
     // Text
     public TextMeshProUGUI counterText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI scoreText;
 
     public float pauseTimeout = 5f;
 
@@ -61,6 +62,13 @@ public class Tapper : MonoBehaviour
     IEnumerator ShowButtonsDelayed()
     {
         yield return new WaitForSeconds(1f);
+        counterText.gameObject.SetActive(false);
+        timerText.gameObject.SetActive(false);
+        if (scoreText != null)
+        {
+            scoreText.gameObject.SetActive(true);
+            scoreText.text = TimeSpan.FromSeconds(timer).ToString(@"mm\:ss\:fff");
+        }
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -79,6 +87,9 @@ public class Tapper : MonoBehaviour
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
+        if (scoreText != null) scoreText.gameObject.SetActive(false);
+        counterText.gameObject.SetActive(true);
+        timerText.gameObject.SetActive(true);
 
         for (int i = 0; i < spots.Length; i++)
         {
