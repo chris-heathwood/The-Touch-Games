@@ -3,11 +3,10 @@
 # General
 
 1. The scoreboards are still not working
-2. The `GameButtons` ideally fade in at the end of the game.
 
 # Rotator
 
-5. Power gauge stage has gone
+1. Power gauge stage has gone
 
 # Tracer
 

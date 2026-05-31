@@ -36,12 +36,13 @@ public class Rotator : MonoBehaviour
     public float baseSpeed = 120f;
     public float acceleration = 40f;
 
-    private enum State { Countdown, HitWindow, Finished }
+    private enum State { Countdown, HitWindow, Gauge, Finished }
     private State state;
 
     private float currentAngle = 270f;
     private int countdownValue;
     private float currentSpeed;
+    private float accuracyScore = 0f;
     private bool runningInEditor = false;
 
 
@@ -68,16 +69,21 @@ public class Rotator : MonoBehaviour
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(false);
         scoreText.text = "";
+        accuracyScore = 0f;
+        rotationCountText.gameObject.SetActive(true);
         rotationCountText.text = totalRotations.ToString();
         if (gaugeElements != null) gaugeElements.SetActive(false);
         if (rotatorElements != null) rotatorElements.SetActive(true);
+        powerGauge.Reset();
         UpdateBallPosition();
     }
 
     void EndGame(float score)
     {
         state = State.Finished;
+        scoreText.gameObject.SetActive(true);
         scoreText.text = Mathf.RoundToInt(score).ToString();
         GameCenter.ReportScore((long)score, GameCenter.Rotator);
         StartCoroutine(ShowButtonsDelayed());
@@ -86,6 +92,9 @@ public class Rotator : MonoBehaviour
     IEnumerator ShowButtonsDelayed()
     {
         yield return new WaitForSeconds(1f);
+        rotationCountText.gameObject.SetActive(false);
+        if (gaugeElements != null) gaugeElements.SetActive(false);
+        if (rotatorElements != null) rotatorElements.SetActive(false);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -152,12 +161,14 @@ public class Rotator : MonoBehaviour
                 countdownValue = newCountdown;
                 rotationCountText.text = Mathf.Max(0, countdownValue).ToString();
                 if (countdownValue <= 0)
+                {
                     state = State.HitWindow;
+                    rotationCountText.gameObject.SetActive(false);
+                }
             }
         }
         else if (state == State.HitWindow)
         {
-            // Ball passed through gap without a tap = fail
             float prevNorm = (((-angleBefore) % 360f) + 360f) % 360f;
             float currNorm = (((-currentAngle) % 360f) + 360f) % 360f;
             bool passedGap = prevNorm < 90f && currNorm >= 90f;
@@ -165,12 +176,23 @@ public class Rotator : MonoBehaviour
             if (TapThisFrame())
             {
                 float normalised = ((currentAngle % 360f) + 360f) % 360f;
-                EndGame(AccuracyScore(normalised) * 1000f);
+                accuracyScore = AccuracyScore(normalised);
+                state = State.Gauge;
+                if (rotatorElements != null) rotatorElements.SetActive(false);
+                if (gaugeElements != null) gaugeElements.SetActive(true);
                 return;
             }
 
             if (passedGap)
                 EndGame(0f);
+        }
+        else if (state == State.Gauge)
+        {
+            if (TapThisFrame())
+            {
+                powerGauge.Stop();
+                EndGame(accuracyScore * powerGauge.Power * 1000f);
+            }
         }
     }
 }
