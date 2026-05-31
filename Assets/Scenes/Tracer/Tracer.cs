@@ -26,7 +26,7 @@ public class Tracer : MonoBehaviour
     // Tracer
     public LineRenderer trackLine;
     public Transform fingerMarker;
-    public float pathThreshold = 1.0f;
+    public float pathThreshold = 1.15f;
     public float gateRadius = 0.8f;     // how close to a gate to trigger it
     public int lapsRequired = 5;
 
@@ -50,9 +50,9 @@ public class Tracer : MonoBehaviour
     private State state;
 
     // Path
+    public float scaleX = 7f;
+    public float scaleY = 10.5f;
     private List<Vector2> pathPoints = new();
-    private float scaleX = 6f;
-    private float scaleY = 3f;
 
     // Gates — player must hit in order: left → centerA → right → centerB → lap
     // centerA and centerB are the same position but approached from opposite sides
