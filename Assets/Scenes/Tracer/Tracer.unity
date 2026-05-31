@@ -1085,7 +1085,7 @@ MonoBehaviour:
   scaleX: 7
   scaleY: 7
   pauseTimeout: 5
-  skipTrackPhase: 0
+  skipTrackPhase: 1
 --- !u!1 &538685122
 GameObject:
   m_ObjectHideFlags: 0
@@ -2020,7 +2020,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2147,12 +2147,12 @@ Transform:
   m_Children:
   - {fileID: 502344381}
   - {fileID: 1182862528}
-  - {fileID: 1520079759}
   - {fileID: 1640263902}
   - {fileID: 1910880914}
   - {fileID: 1714442913}
-  - {fileID: 469081668}
   - {fileID: 1009859347}
+  - {fileID: 469081668}
+  - {fileID: 1520079759}
   - {fileID: 727091487}
   - {fileID: 350926996}
   - {fileID: 1591332119}
@@ -2230,7 +2230,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

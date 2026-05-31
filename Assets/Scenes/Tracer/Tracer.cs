@@ -159,6 +159,8 @@ public class Tracer : MonoBehaviour
         currentTarget = 0;
         aimPosition = Vector2.zero;
         aimVelocity = Vector2.zero;
+        if (whiteCircle != null)
+            whiteCircle.position = Vector3.zero;
         steadyGauge = 1f;
         isSteadying = false;
         if (steadyGaugeFill != null)
@@ -387,20 +389,50 @@ public class Tracer : MonoBehaviour
         }
     }
 
-    void UpdateShooter()
+    static bool Bounds2DContains(SpriteRenderer sprite, Vector2 point)
     {
-        Vector2 point = InputPosition();
+        Bounds b = sprite.bounds;
+        return point.x >= b.min.x && point.x <= b.max.x &&
+               point.y >= b.min.y && point.y <= b.max.y;
+    }
 
-        if (TapThisFrame())
+    bool AnyTouchHeldOnSprite(SpriteRenderer sprite)
+    {
+        if (runningInEditor)
+            return Input.GetMouseButton(0) && Bounds2DContains(sprite, Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        for (int i = 0; i < Input.touchCount; i++)
         {
-            if (shootSprite.bounds.Contains(point))
+            Vector2 pos = Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position);
+            if (Bounds2DContains(sprite, pos)) return true;
+        }
+        return false;
+    }
+
+    bool AnyTouchBeganOnSprite(SpriteRenderer sprite)
+    {
+        if (runningInEditor)
+            return Input.GetMouseButtonDown(0) && Bounds2DContains(sprite, Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch t = Input.GetTouch(i);
+            if (t.phase == TouchPhase.Began)
             {
-                Shoot();
-                return;
+                Vector2 pos = Camera.main.ScreenToWorldPoint(t.position);
+                if (Bounds2DContains(sprite, pos)) return true;
             }
         }
+        return false;
+    }
 
-        bool heldOnSteady = InputHeld() && steadySprite.bounds.Contains(point);
+    void UpdateShooter()
+    {
+        if (AnyTouchBeganOnSprite(shootSprite))
+        {
+            Shoot();
+            return;
+        }
+
+        bool heldOnSteady = AnyTouchHeldOnSprite(steadySprite);
         isSteadying = runningInEditor
             ? heldOnSteady || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
             : heldOnSteady;
