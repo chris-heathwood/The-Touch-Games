@@ -123,6 +123,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &83727687 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9170824715691744665, guid: 0e22b2d88fa0b4575ac8cba5ef5e2fa7, type: 3}
+  m_PrefabInstance: {fileID: 2066903263}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &177836925
 GameObject:
   m_ObjectHideFlags: 0
@@ -454,9 +465,10 @@ MonoBehaviour:
   spots:
   - {fileID: 2126931733}
   - {fileID: 728734075}
-  totalSwipes: 100
+  totalSwipes: 10
   counterText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
+  scoreText: {fileID: 83727687}
   pauseTimeout: 5
 --- !u!1 &538685122
 GameObject:
