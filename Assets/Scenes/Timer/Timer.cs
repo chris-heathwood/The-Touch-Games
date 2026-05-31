@@ -67,6 +67,7 @@ public class Timer : MonoBehaviour
         totalScore = 0f;
         nextFlashAt = UnityEngine.Random.Range(0.5f, maxInterval);
         circle.color = blue;
+        scoreText.gameObject.SetActive(false);
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
@@ -80,6 +81,7 @@ public class Timer : MonoBehaviour
     void EndGame()
     {
         float score = totalScore * powerGauge.Power * 1000f;
+        scoreText.gameObject.SetActive(true);
         scoreText.text = Mathf.RoundToInt(score).ToString();
         GameCenter.ReportScore((long)score, GameCenter.Timer);
         menuButton.gameObject.SetActive(true);
