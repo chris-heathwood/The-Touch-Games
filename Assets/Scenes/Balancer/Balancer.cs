@@ -110,7 +110,7 @@ public class Balancer : MonoBehaviour
 
     IEnumerator ShowButtonsDelayed()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);

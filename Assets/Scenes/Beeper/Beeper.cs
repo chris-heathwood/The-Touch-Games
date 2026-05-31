@@ -24,6 +24,7 @@ public class Beeper : MonoBehaviour
     // Text
     public TextMeshProUGUI swipeCountText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI scoreText;
 
     public enum State { Holding, Ready, Failed }
     public State state;
@@ -62,13 +63,20 @@ public class Beeper : MonoBehaviour
     {
         spots[currentSpot].color = yellow;
         GameCenter.ReportScore(swipeCount, GameCenter.Beeper);
+        if (scoreText != null)
+        {
+            scoreText.gameObject.SetActive(true);
+            scoreText.text = swipeCount.ToString();
+        }
         state = State.Failed;
         StartCoroutine(ShowButtonsDelayed());
     }
 
     IEnumerator ShowButtonsDelayed()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
+        swipeCountText.gameObject.SetActive(false);
+        timerText.gameObject.SetActive(false);
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -91,6 +99,9 @@ public class Beeper : MonoBehaviour
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
+        if (scoreText != null) scoreText.gameObject.SetActive(false);
+        swipeCountText.gameObject.SetActive(true);
+        timerText.gameObject.SetActive(true);
 
         spots[0].color = white;
         spots[1].color = yellow;
