@@ -1076,14 +1076,16 @@ MonoBehaviour:
   targetScaleMultiplier: 0.5
   orbitSpeed: 90
   jitterSpeed: 45
-  steadyDrain: 0.3
-  jitterReduction: 0.8
+  steadyDrain: 0.6
+  jitterReduction: 0.5
+  steadyPullSpeed: 2
   lapCountText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
   scoreText: {fileID: 1267229034}
   scaleX: 7
   scaleY: 7
   pauseTimeout: 5
+  skipTrackPhase: 0
 --- !u!1 &538685122
 GameObject:
   m_ObjectHideFlags: 0

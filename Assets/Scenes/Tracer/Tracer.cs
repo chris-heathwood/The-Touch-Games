@@ -38,8 +38,9 @@ public class Tracer : MonoBehaviour
     public float targetScaleMultiplier = 0.5f;
     public float orbitSpeed = 90f;
     public float jitterSpeed = 45f;
-    public float steadyDrain = 0.3f;
+    public float steadyDrain = 0.15f;
     public float jitterReduction = 0.8f;
+    public float steadyPullSpeed = 2f;
 
     // Text
     public TextMeshProUGUI lapCountText;
@@ -77,6 +78,7 @@ public class Tracer : MonoBehaviour
     private float shooterScore = 0f;
     private float tracerScore = 0f;
 
+    public bool skipTrackPhase = false;
     private bool runningInEditor = false;
 
     private Vector3[] violetOriginalScales;
@@ -179,13 +181,28 @@ public class Tracer : MonoBehaviour
         resetButton.gameObject.SetActive(false);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(false);
         if (menuBackground != null) menuBackground.gameObject.SetActive(false);
+        foreach (var c in violetCircles) c.gameObject.SetActive(false);
+
+        if (skipTrackPhase)
+        {
+            lapCountText.gameObject.SetActive(false);
+            if (timerText != null) timerText.gameObject.SetActive(false);
+            tracerElements.SetActive(false);
+            shooterElements.SetActive(true);
+            violetCircles[0].gameObject.SetActive(true);
+            violetCircles[0].localScale = violetOriginalScales[0] * targetScaleMultiplier;
+            float firstTargetRadius = violetOriginalScales[0].x * targetScaleMultiplier * 0.5f;
+            aimPosition = (Vector2)violetCircles[0].position + UnityEngine.Random.insideUnitCircle.normalized * (firstTargetRadius + orbitRadius);
+            aimVelocity = Vector2.zero;
+            state = State.Shooting;
+            return;
+        }
+
         tracerElements.SetActive(true);
         shooterElements.SetActive(false);
 
         if (fingerMarker != null)
             fingerMarker.position = new Vector3(-scaleX, 0f, 0f);
-
-        foreach (var c in violetCircles) c.gameObject.SetActive(false);
     }
 
     void EndGame()
@@ -418,6 +435,13 @@ public class Tracer : MonoBehaviour
         aimVelocity = Vector2.ClampMagnitude(aimVelocity, orbitSpeed);
 
         aimPosition += aimVelocity * Time.deltaTime;
+
+        // Steady pulls aim toward the target centre
+        if (steadyActive)
+        {
+            Vector2 toCenter = (Vector2)violetCircles[currentTarget].position - aimPosition;
+            aimPosition += toCenter * steadyPullSpeed * Time.deltaTime;
+        }
 
         // Elastic boundary — keep aim within wander radius of the target
         Vector2 center = violetCircles[currentTarget].position;
