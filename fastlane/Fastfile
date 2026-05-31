@@ -14,6 +14,12 @@ platform :ios do
       key_filepath: ENV["ASC_KEY_PATH"] || ".asc_key.p8"
     )
 
+    get_certificates(api_key: api_key)
+    get_provisioning_profile(
+      api_key:        api_key,
+      app_identifier: "com.thetouchgames.app"
+    )
+
     build_app(
       project:          XCODEPROJ,
       scheme:           "Unity-iPhone",

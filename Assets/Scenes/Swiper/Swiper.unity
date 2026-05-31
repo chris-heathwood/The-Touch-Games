@@ -465,7 +465,7 @@ MonoBehaviour:
   spots:
   - {fileID: 2126931733}
   - {fileID: 728734075}
-  totalSwipes: 10
+  totalSwipes: 100
   counterText: {fileID: 1482626318}
   timerText: {fileID: 177836927}
   scoreText: {fileID: 83727687}

@@ -58,6 +58,7 @@
     "dotnet.defaultSolution": "Messing.sln",
     "cSpell.words": [
         "appstoreconnect",
+        "batchmode",
         "keygen",
         "lerp",
         "Mathf",
