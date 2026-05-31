@@ -43,6 +43,7 @@ public class Tracer : MonoBehaviour
 
     // Text
     public TextMeshProUGUI lapCountText;
+    public TextMeshProUGUI timerText;
     public TextMeshProUGUI scoreText;
 
     private enum State { Tracing, Shooting, Finished }
@@ -165,7 +166,14 @@ public class Tracer : MonoBehaviour
         }
         shooterScore = 0f;
         tracerScore = 0f;
+        lapCountText.gameObject.SetActive(true);
         lapCountText.text = "0";
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(true);
+            timerText.text = "00:00:000";
+        }
+        scoreText.gameObject.SetActive(false);
         scoreText.text = "";
         menuButton.gameObject.SetActive(false);
         resetButton.gameObject.SetActive(false);
@@ -186,14 +194,15 @@ public class Tracer : MonoBehaviour
         tracerElements.SetActive(false);
         shooterElements.SetActive(false);
         float finalScore = tracerScore + shooterScore;
-        scoreText.text = Mathf.RoundToInt(finalScore).ToString();
         GameCenter.ReportScore((long)finalScore, GameCenter.Tracer);
-        StartCoroutine(ShowButtonsDelayed());
+        StartCoroutine(ShowButtonsDelayed(finalScore));
     }
 
-    IEnumerator ShowButtonsDelayed()
+    IEnumerator ShowButtonsDelayed(float finalScore)
     {
         yield return new WaitForSeconds(1f);
+        scoreText.gameObject.SetActive(true);
+        scoreText.text = Mathf.RoundToInt(finalScore).ToString();
         menuButton.gameObject.SetActive(true);
         resetButton.gameObject.SetActive(true);
         if (leaderboardButton != null) leaderboardButton.gameObject.SetActive(true);
@@ -301,6 +310,8 @@ public class Tracer : MonoBehaviour
         }
 
         tracerTimer += Time.deltaTime;
+        if (timerText != null)
+            timerText.text = TimeSpan.FromSeconds(tracerTimer).ToString(@"mm\:ss\:fff");
 
         // First center gate — lock direction on first lap, enforce it on subsequent laps
         if (nextGate == 1)
@@ -343,7 +354,9 @@ public class Tracer : MonoBehaviour
 
                 if (lapsCompleted >= lapsRequired)
                 {
-                    tracerScore = Mathf.Max(0f, 1000f - (float)tracerTimer * 10f);
+                    tracerScore = Mathf.Max(0f, 1000f - (float)tracerTimer * 3f);
+                    lapCountText.gameObject.SetActive(false);
+                    if (timerText != null) timerText.gameObject.SetActive(false);
                     tracerElements.SetActive(false);
                     shooterElements.SetActive(true);
                     violetCircles[0].gameObject.SetActive(true);
